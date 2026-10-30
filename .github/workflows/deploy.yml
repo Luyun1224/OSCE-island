@@ -9,6 +9,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
 concurrency:
   group: pages
@@ -37,5 +38,19 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      # 若 repo 的 Pages 來源仍是「Deploy from a branch」，GitHub 會同時發布未建置的原始碼（網頁會一片空白）。
+      # 等它完成後再發布建置版本，確保最後上線的是正確版本。
+      # 根本解法：Settings → Pages → Source 改為「GitHub Actions」。
+      - name: Wait for legacy branch deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 48); do
+            pending=$(gh api "repos/${{ github.repository }}/actions/runs?head_sha=${{ github.sha }}&per_page=30" \
+              --jq '[.workflow_runs[] | select(.name == "pages-build-deployment" and .status != "completed")] | length')
+            if [ "$pending" = "0" ]; then echo "No pending legacy deployment"; break; fi
+            echo "Waiting for legacy pages-build-deployment ($i)..."
+            sleep 5
+          done
       - id: deployment
         uses: actions/deploy-pages@v4

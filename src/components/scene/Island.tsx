@@ -118,6 +118,11 @@ export function Island({ data, selected, hovered, dimmed, onSelect, onHover }: I
           >
             <span className="mr-1">{data.icon}</span>
             {data.title}
+            {data.learningRoute ? (
+              <span className="ml-1.5 rounded-full bg-emerald-500 px-1.5 py-0.5 align-middle text-[10px] font-bold text-white">已開放</span>
+            ) : (
+              <span className="ml-1.5 rounded-full bg-slate-500/80 px-1.5 py-0.5 align-middle text-[10px] font-bold text-white">🚧 尚未開放</span>
+            )}
             {hovered && <div className="text-center text-[10px] font-medium opacity-90">{data.buildingName}</div>}
           </div>
         </Html>

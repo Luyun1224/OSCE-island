@@ -25,6 +25,7 @@ export function IslandCard({ island, active, compact, onClick, onHover }: Island
       >
         <span>{island.icon}</span>
         {island.shortTitle}
+        {!island.learningRoute && <span className={`text-[10px] font-medium ${active ? 'text-white/80' : 'text-slate-400'}`}>未開放</span>}
       </button>
     );
   }
@@ -52,6 +53,11 @@ export function IslandCard({ island, active, compact, onClick, onHover }: Island
             0{island.order}
           </span>
           <span className="truncate text-sm font-bold text-slate-800">{island.shortTitle}</span>
+          {island.learningRoute ? (
+            <span className="shrink-0 rounded-full bg-emerald-100 px-1.5 py-px text-[10px] font-bold text-emerald-700">已開放</span>
+          ) : (
+            <span className="shrink-0 rounded-full bg-slate-200 px-1.5 py-px text-[10px] font-bold text-slate-500">尚未開放</span>
+          )}
         </span>
         <span className="block truncate text-[11px] text-slate-500">{island.englishTitle}</span>
       </span>

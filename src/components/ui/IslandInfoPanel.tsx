@@ -32,7 +32,12 @@ export function IslandInfoPanel({ island, onClose, onEnter }: IslandInfoPanelPro
         >
           ×
         </button>
-        <div className="text-[11px] font-bold tracking-[0.2em] opacity-80">ISLAND 0{island.order}</div>
+        <div className="flex items-center gap-2 text-[11px] font-bold tracking-[0.2em]">
+          <span className="opacity-80">ISLAND 0{island.order}</span>
+          <span className={`rounded-full px-2 py-0.5 text-[10px] tracking-normal ${island.learningRoute ? 'bg-emerald-400 text-emerald-950' : 'bg-black/25 text-white'}`}>
+            {island.learningRoute ? '✅ 已開放' : '🚧 尚未開放'}
+          </span>
+        </div>
         <h2 className="mt-1 flex items-center gap-2 text-xl font-black md:text-2xl">
           <span>{island.icon}</span>
           {island.title}
@@ -41,6 +46,13 @@ export function IslandInfoPanel({ island, onClose, onEnter }: IslandInfoPanelPro
       </header>
 
       <div className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
+        {!island.learningRoute && (
+          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3 text-[12px] leading-relaxed text-slate-600">
+            🚧 <span className="font-bold">此島嶼的學習區尚未開放</span>，內容正在規劃中。以下為預定的學習方向。
+            <br />
+            目前已開放：🛠️ 技能操作島 › 傷口縫合
+          </div>
+        )}
         <div className="flex items-center gap-2 rounded-xl p-2.5 text-sm" style={{ background: `${island.themeColor}14` }}>
           <span className="text-base">🏛️</span>
           <span className="text-slate-500">主建築</span>
@@ -106,14 +118,20 @@ export function IslandInfoPanel({ island, onClose, onEnter }: IslandInfoPanelPro
         >
           🗺️ 返回全景
         </button>
-        <button
-          type="button"
-          onClick={() => onEnter(island)}
-          className="flex-1 rounded-xl px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:brightness-110 active:scale-95"
-          style={{ background: island.themeColor }}
-        >
-          {island.learningRoute ? '進入學習區 →' : '進入學習區（規劃中）'}
-        </button>
+        {island.learningRoute ? (
+          <button
+            type="button"
+            onClick={() => onEnter(island)}
+            className="flex-1 rounded-xl px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:brightness-110 active:scale-95"
+            style={{ background: island.themeColor }}
+          >
+            進入學習區 →
+          </button>
+        ) : (
+          <button type="button" disabled className="flex-1 cursor-not-allowed rounded-xl bg-slate-200 px-4 py-2.5 text-sm font-bold text-slate-500">
+            🚧 學習區尚未開放
+          </button>
+        )}
       </footer>
     </aside>
   );
