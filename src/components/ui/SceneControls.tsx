@@ -28,32 +28,54 @@ export function useTimeOfDayPreference() {
   return [time, setTime] as const;
 }
 
-/** 群島背景音樂：只在群島頁播放，離開頁面即淡出停止 */
+/**
+ * 群島背景音樂：預設開啟，只在群島頁播放，離開頁面即淡出停止。
+ * 瀏覽器規定網頁需在使用者第一次互動後才能發聲：
+ * 本次瀏覽已互動過（例如從技能中心返回）→ 立即播放；首次進站 → 在第一次點擊／觸控／按鍵時開始。
+ */
 function useIslandMusic(theme: TimeOfDay) {
   const music = useRef<IslandMusic | null>(null);
-  const pref = read(KEY_MUSIC, { on: false, volume: 0.6 });
+  const pref = read(KEY_MUSIC, { on: true, volume: 0.6 });
   const [on, setOn] = useState(false);
+  const [waiting, setWaiting] = useState(pref.on);
   const [volume, setVolume] = useState(pref.volume);
   const wantsOn = useRef(pref.on);
+  const latest = useRef({ theme, volume });
+  latest.current = { theme, volume };
 
   const get = () => (music.current ??= new IslandMusic());
 
   useEffect(() => {
-    // 上次開著音樂：等使用者第一次點擊畫面後自動播放（瀏覽器的自動播放限制）
-    const resume = (e: PointerEvent) => {
-      if ((e.target as Element | null)?.closest?.('[data-music-toggle]')) return;
-      if (wantsOn.current && !music.current?.playing) {
-        get().setTheme(theme);
-        get().setVolume(volume);
-        get().start().then(() => setOn(true));
-      }
-      window.removeEventListener('pointerdown', resume);
+    const play = () => {
+      if (!wantsOn.current || music.current?.playing) return;
+      const m = get();
+      m.setTheme(latest.current.theme);
+      m.setVolume(latest.current.volume);
+      m.start().then(() => {
+        setOn(true);
+        setWaiting(false);
+      });
     };
-    window.addEventListener('pointerdown', resume);
+    const onGesture = (e: Event) => {
+      // 點的是音樂按鈕本身時交給按鈕處理，避免一開一關互相抵銷
+      if ((e.target as Element | null)?.closest?.('[data-music-toggle]')) return;
+      play();
+      removeGesture();
+    };
+    const removeGesture = () => {
+      window.removeEventListener('pointerdown', onGesture);
+      window.removeEventListener('keydown', onGesture);
+    };
+    const activated = (navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation?.hasBeenActive;
+    if (wantsOn.current && activated) play();
+    else if (wantsOn.current) {
+      window.addEventListener('pointerdown', onGesture);
+      window.addEventListener('keydown', onGesture);
+    }
     const vis = () => music.current?.suspend(document.hidden);
     document.addEventListener('visibilitychange', vis);
     return () => {
-      window.removeEventListener('pointerdown', resume);
+      removeGesture();
       document.removeEventListener('visibilitychange', vis);
       music.current?.dispose();
       music.current = null;
@@ -79,10 +101,11 @@ function useIslandMusic(theme: TimeOfDay) {
       setOn(true);
       wantsOn.current = true;
     }
+    setWaiting(false);
     write(KEY_MUSIC, { on: wantsOn.current, volume });
   };
 
-  return { supported: IslandMusic.supported(), on, toggle, volume, setVolume };
+  return { supported: IslandMusic.supported(), on, waiting, toggle, volume, setVolume };
 }
 
 export function SceneControls({ time, onTime }: { time: TimeOfDay; onTime: (t: TimeOfDay) => void }) {
@@ -127,6 +150,9 @@ export function SceneControls({ time, onTime }: { time: TimeOfDay; onTime: (t: T
             <span className={music.on ? 'animate-pulse' : ''}>{music.on ? '🎵' : '🔇'}</span>
             <span className="hidden sm:inline">{music.on ? '音樂開' : '音樂'}</span>
           </button>
+          {music.waiting && !music.on && (
+            <span className="hidden animate-pulse whitespace-nowrap px-1 text-[11px] font-bold sm:inline">點一下畫面即播放</span>
+          )}
           <button type="button" onClick={() => setShowVol((v) => !v)} aria-label="音量" className="rounded-xl px-2 py-1.5 text-[12px] hover:bg-black/5">
             🔊
           </button>
