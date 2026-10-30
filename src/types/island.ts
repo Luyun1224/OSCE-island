@@ -70,6 +70,8 @@ export interface IslandConfig {
   examFocus: string[];
   /** 鏡頭聚焦時相對於島嶼中心的偏移，未設定則用預設值 */
   cameraOffset?: Vec3;
+  /** 已開放的學習區路由（未設定代表規劃中） */
+  learningRoute?: string;
   /** 學習模組（第二階段開始填入真實內容） */
   modules: LearningModule[];
 }

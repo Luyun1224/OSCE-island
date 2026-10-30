@@ -1,74 +1,61 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { IslandMapScene } from './components/scene/IslandMapScene';
-import { NavigationMenu } from './components/ui/NavigationMenu';
-import { IslandInfoPanel } from './components/ui/IslandInfoPanel';
-import { AppHeader, ControlHint, Toast } from './components/ui/Overlay';
-import { getIsland } from './data/islandData';
-import type { IslandConfig, IslandId } from './types/island';
+import { Suspense, lazy, useMemo, type ComponentType, type LazyExoticComponent } from 'react';
+import { ISLAND_MAP } from './data/islandData';
+import { IslandMapPage } from './pages/IslandMapPage';
+import { SkillCenterPage } from './features/skills/SkillCenterPage';
+import { getSkill } from './features/skills/registry/skillRegistry';
+import { matchPath, navigate, useHashPath } from './router';
+import type { IslandId } from './types/island';
+
+/**
+ * 路由表
+ *  #/                         群島地圖
+ *  #/map/:islandId            群島地圖並聚焦指定島嶼
+ *  #/island/procedural-skills 技能訓練中心
+ *  #/skill/:skillId           技能訓練關卡
+ */
+const lazyCache = new Map<string, LazyExoticComponent<ComponentType>>();
+
+function SkillRoute({ skillId }: { skillId: string }) {
+  const skill = getSkill(skillId);
+  const Module = useMemo(() => {
+    if (!skill?.load || skill.status !== 'available') return null;
+    if (!lazyCache.has(skill.id)) lazyCache.set(skill.id, lazy(skill.load));
+    return lazyCache.get(skill.id)!;
+  }, [skill]);
+
+  if (!Module) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
+        <p className="text-lg font-bold text-slate-700">此技能關卡尚在規劃中</p>
+        <button type="button" onClick={() => navigate('/island/procedural-skills')} className="rounded-xl bg-blue-700 px-4 py-2 text-sm font-bold text-white">
+          回到技能訓練中心
+        </button>
+      </div>
+    );
+  }
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-full items-center justify-center text-sm font-medium text-slate-500">
+          <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+          正在準備模擬診間…
+        </div>
+      }
+    >
+      <Module />
+    </Suspense>
+  );
+}
 
 export default function App() {
-  const [selectedId, setSelectedId] = useState<IslandId | null>(null);
-  const [hoveredId, setHoveredId] = useState<IslandId | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
-  const toastTimer = useRef<number>();
+  const path = useHashPath();
 
-  const selected = getIsland(selectedId);
+  if (matchPath('/island/procedural-skills', path)) return <SkillCenterPage />;
 
-  const backToOverview = useCallback(() => setSelectedId(null), []);
+  const skill = matchPath('/skill/:skillId', path);
+  if (skill) return <SkillRoute key={skill.skillId} skillId={skill.skillId} />;
 
-  const showToast = useCallback((msg: string) => {
-    setToast(msg);
-    window.clearTimeout(toastTimer.current);
-    toastTimer.current = window.setTimeout(() => setToast(null), 2600);
-  }, []);
-
-  // 第一階段：學習區尚未開放，先顯示提示。之後在此導向 /island/:id 路由。
-  const handleEnter = useCallback(
-    (island: IslandConfig) => showToast(`「${island.buildingName}」學習區將於下一階段開放 🚧`),
-    [showToast],
-  );
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') backToOverview();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [backToOverview]);
-
-  return (
-    <div className="relative h-full w-full overflow-hidden">
-      <div className="absolute inset-0">
-        <IslandMapScene
-          selectedId={selectedId}
-          hoveredId={hoveredId}
-          onSelect={setSelectedId}
-          onHover={setHoveredId}
-          onBackToOverview={backToOverview}
-        />
-      </div>
-
-      {/* UI 疊層 */}
-      <div className="pointer-events-none absolute inset-0 z-20 flex flex-col gap-2 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:gap-4 md:p-5">
-        <div className="flex flex-col gap-2 md:w-72 md:gap-4">
-          <AppHeader />
-          <NavigationMenu selectedId={selectedId} onSelect={setSelectedId} onHover={setHoveredId} onOverview={backToOverview} />
-        </div>
-      </div>
-
-      {selected && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 flex justify-center md:inset-y-0 md:left-auto md:right-0 md:items-center md:p-5">
-          <IslandInfoPanel island={selected} onClose={backToOverview} onEnter={handleEnter} />
-        </div>
-      )}
-
-      {!selected && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <ControlHint />
-        </div>
-      )}
-
-      <Toast message={toast} />
-    </div>
-  );
+  const map = matchPath('/map/:islandId', path);
+  const islandId = map && map.islandId in ISLAND_MAP ? (map.islandId as IslandId) : null;
+  return <IslandMapPage key={islandId ?? 'overview'} initialIslandId={islandId} />;
 }

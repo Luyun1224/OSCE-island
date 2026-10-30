@@ -67,7 +67,7 @@ export function IslandInfoPanel({ island, onClose, onEnter }: IslandInfoPanelPro
         </div>
 
         <div>
-          <h3 className="mb-2 text-xs font-bold tracking-wider text-slate-400">學習模組（規劃中）</h3>
+          <h3 className="mb-2 text-xs font-bold tracking-wider text-slate-400">學習模組</h3>
           <ul className="space-y-1.5">
             {island.modules.map((m) => (
               <li key={m.id} className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50/70 px-3 py-2 text-[12px]">
@@ -77,7 +77,13 @@ export function IslandInfoPanel({ island, onClose, onEnter }: IslandInfoPanelPro
                   </span>
                   {m.title}
                 </span>
-                <span className="text-[10px] text-slate-400">即將開放</span>
+                {m.status === 'available' ? (
+                  <span className="text-[10px] font-bold" style={{ color: island.themeColor }}>
+                    已開放
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-slate-400">即將開放</span>
+                )}
               </li>
             ))}
           </ul>
@@ -106,7 +112,7 @@ export function IslandInfoPanel({ island, onClose, onEnter }: IslandInfoPanelPro
           className="flex-1 rounded-xl px-4 py-2.5 text-sm font-bold text-white shadow-md transition hover:brightness-110 active:scale-95"
           style={{ background: island.themeColor }}
         >
-          進入學習區 →
+          {island.learningRoute ? '進入學習區 →' : '進入學習區（規劃中）'}
         </button>
       </footer>
     </aside>

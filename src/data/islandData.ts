@@ -137,17 +137,18 @@ export const ISLANDS: IslandConfig[] = [
     },
     tagline: '標準流程 × 無菌觀念 × 熟練操作',
     description:
-      '以操作技能為核心的模擬訓練中心。練習器材準備、無菌技術、靜脈注射、導尿、傷口縫合、CPR 等單項技能操作，並建立正確流程與安全意識。',
+      '以操作技能為核心的模擬訓練中心。在技能訓練中心練習傷口縫合、導尿管置入、靜脈留置針置入、心電圖操作等八項單項技能，熟悉器材準備、無菌技術與標準操作流程。',
     buildingName: '技能操作中心',
     icon: '🛠️',
     position: [-14, 0, 19],
     radius: 7.8,
     styleKeywords: ['模擬器材', '操作平台', '訓練艙', '機械感'],
     examFocus: ['器材準備與核對', '無菌技術', '標準操作流程', '病人安全'],
+    learningRoute: '/island/procedural-skills',
     modules: [
-      { id: 'ps-iv', title: '周邊靜脈注射', type: 'skill', status: 'planned' },
-      { id: 'ps-suture', title: '傷口縫合', type: 'skill', status: 'planned' },
-      { id: 'ps-cpr', title: '基本救命術 BLS', type: 'simulation', status: 'planned' },
+      { id: 'wound-suturing', title: '傷口縫合', type: 'skill', status: 'available' },
+      { id: 'urinary-catheterization', title: '導尿管置入', type: 'skill', status: 'planned' },
+      { id: 'iv-cannulation', title: '靜脈留置針置入', type: 'skill', status: 'planned' },
     ],
   },
 ];
