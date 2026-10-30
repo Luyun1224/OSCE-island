@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { Vec3 } from '../../types/island';
+import { useTimeOfDay } from './timeOfDay';
 
 /**
  * Low-poly 共用幾何元件
@@ -125,10 +126,18 @@ export function Bush({ position, scale = 1, color = '#62b874' }: { position: Vec
 }
 
 export function Lamp({ position, color = '#fde68a' }: { position: Vec3; color?: string }) {
+  const night = useTimeOfDay() === 'night';
   return (
     <group position={position}>
       <Cyl args={[0.05, 0.07, 1.4, 6]} position={[0, 0.7, 0]} color="#475569" />
-      <Ball r={0.16} position={[0, 1.48, 0]} color={color} emissive={color} emissiveIntensity={0.8} />
+      <Ball r={0.16} position={[0, 1.48, 0]} color={color} emissive={color} emissiveIntensity={night ? 3 : 0.8} />
+      {/* 夜晚的路燈光暈 */}
+      {night && (
+        <mesh position={[0, 1.48, 0]}>
+          <sphereGeometry args={[0.45, 12, 8]} />
+          <meshBasicMaterial color={color} transparent opacity={0.25} depthWrite={false} />
+        </mesh>
+      )}
     </group>
   );
 }

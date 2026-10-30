@@ -3,6 +3,7 @@ import { IslandMapScene } from '../components/scene/IslandMapScene';
 import { NavigationMenu } from '../components/ui/NavigationMenu';
 import { IslandInfoPanel } from '../components/ui/IslandInfoPanel';
 import { AppHeader, ControlHint, Toast } from '../components/ui/Overlay';
+import { SceneControls, useTimeOfDayPreference } from '../components/ui/SceneControls';
 import { getIsland } from '../data/islandData';
 import type { IslandConfig, IslandId } from '../types/island';
 import { navigate } from '../router';
@@ -11,6 +12,7 @@ export function IslandMapPage({ initialIslandId = null }: { initialIslandId?: Is
   const [selectedId, setSelectedId] = useState<IslandId | null>(initialIslandId);
   const [hoveredId, setHoveredId] = useState<IslandId | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [timeOfDay, setTimeOfDay] = useTimeOfDayPreference();
   const toastTimer = useRef<number>();
 
   const selected = getIsland(selectedId);
@@ -49,6 +51,7 @@ export function IslandMapPage({ initialIslandId = null }: { initialIslandId?: Is
           onSelect={setSelectedId}
           onHover={setHoveredId}
           onBackToOverview={backToOverview}
+          timeOfDay={timeOfDay}
         />
       </div>
 
@@ -58,6 +61,11 @@ export function IslandMapPage({ initialIslandId = null }: { initialIslandId?: Is
           <AppHeader />
           <NavigationMenu selectedId={selectedId} onSelect={setSelectedId} onHover={setHoveredId} onOverview={backToOverview} />
         </div>
+      </div>
+
+      {/* 白天／深夜與背景音樂 */}
+      <div className="pointer-events-none absolute right-3 top-[7.6rem] z-20 md:right-5 md:top-5">
+        <SceneControls time={timeOfDay} onTime={setTimeOfDay} />
       </div>
 
       {selected && (

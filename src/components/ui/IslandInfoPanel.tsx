@@ -19,7 +19,7 @@ export function IslandInfoPanel({ island, onClose, onEnter }: IslandInfoPanelPro
   return (
     <aside
       key={island.id}
-      className="pointer-events-auto flex max-h-[52vh] w-full animate-fade-up flex-col overflow-hidden rounded-t-3xl bg-white/90 shadow-glass backdrop-blur-md md:max-h-[calc(100vh-7rem)] md:w-[380px] md:rounded-3xl"
+      className="pointer-events-auto flex max-h-[52vh] w-full animate-fade-up flex-col overflow-hidden rounded-t-3xl bg-white/90 shadow-glass backdrop-blur-md md:max-h-[calc(100vh-10rem)] md:mt-12 md:w-[380px] md:rounded-3xl"
     >
       {/* 主題色頁首 */}
       <header className="relative shrink-0 px-5 pb-4 pt-5 text-white" style={{ background: `linear-gradient(135deg, ${island.theme.primary}, ${island.theme.accent})` }}>

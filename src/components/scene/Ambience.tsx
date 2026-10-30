@@ -3,18 +3,21 @@ import { useFrame } from '@react-three/fiber';
 import type { Group } from 'three';
 import { Ball, Box, Cyl } from './primitives';
 import { WATER_LEVEL } from './Ocean';
+import { useTimeOfDay } from './timeOfDay';
 
 /** Low Poly 雲朵 */
 function Cloud({ position, scale = 1, speed = 0.3 }: { position: [number, number, number]; scale?: number; speed?: number }) {
   const ref = useRef<Group>(null);
+  // 夜晚的雲帶一點月光，避免變成黑色剪影
+  const glow = useTimeOfDay() === 'night' ? { emissive: '#8ea2d6', emissiveIntensity: 0.85 } : {};
   useFrame(({ clock }) => {
     if (ref.current) ref.current.position.x = position[0] + Math.sin(clock.getElapsedTime() * speed * 0.1) * 6;
   });
   return (
     <group ref={ref} position={position} scale={scale}>
-      <Ball r={1.4} detail={0} color="#ffffff" />
-      <Ball r={1.1} detail={0} position={[1.5, -0.2, 0.2]} color="#f8fafc" />
-      <Ball r={0.95} detail={0} position={[-1.4, -0.3, -0.1]} color="#f8fafc" />
+      <Ball r={1.4} detail={0} color="#ffffff" {...glow} />
+      <Ball r={1.1} detail={0} position={[1.5, -0.2, 0.2]} color="#f8fafc" {...glow} />
+      <Ball r={0.95} detail={0} position={[-1.4, -0.3, -0.1]} color="#f8fafc" {...glow} />
     </group>
   );
 }

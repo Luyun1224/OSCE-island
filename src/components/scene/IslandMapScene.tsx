@@ -7,6 +7,7 @@ import { CentralPlaza } from './CentralPlaza';
 import { Island } from './Island';
 import { Ocean } from './Ocean';
 import { SeaRoutes } from './SeaRoutes';
+import { SkyRig, TimeOfDayProvider, type TimeOfDay } from './timeOfDay';
 
 interface IslandMapSceneProps {
   selectedId: IslandId | null;
@@ -14,12 +15,11 @@ interface IslandMapSceneProps {
   onSelect: (id: IslandId) => void;
   onHover: (id: IslandId | null) => void;
   onBackToOverview: () => void;
+  timeOfDay: TimeOfDay;
 }
 
-const SKY = '#bfe6f5';
-
 /** IslandMapScene：3D 群島主場景 */
-export function IslandMapScene({ selectedId, hoveredId, onSelect, onHover, onBackToOverview }: IslandMapSceneProps) {
+export function IslandMapScene({ selectedId, hoveredId, onSelect, onHover, onBackToOverview, timeOfDay }: IslandMapSceneProps) {
   const focus = getIsland(selectedId);
 
   return (
@@ -32,27 +32,10 @@ export function IslandMapScene({ selectedId, hoveredId, onSelect, onHover, onBac
         if (e.type === 'dblclick') onBackToOverview();
       }}
     >
-      <color attach="background" args={[SKY]} />
-      <fog attach="fog" args={[SKY, 120, 320]} />
+      <TimeOfDayProvider value={timeOfDay}>
+      <SkyRig time={timeOfDay} />
 
-      <hemisphereLight args={['#ffffff', '#7dd3c0', 0.9]} />
-      <ambientLight intensity={0.25} />
-      <directionalLight
-        position={[30, 50, 25]}
-        intensity={1.6}
-        color="#fff6e5"
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-camera-left={-45}
-        shadow-camera-right={45}
-        shadow-camera-top={45}
-        shadow-camera-bottom={-45}
-        shadow-camera-near={1}
-        shadow-camera-far={140}
-        shadow-bias={-0.0005}
-      />
-
-      <Ocean />
+      <Ocean time={timeOfDay} />
       <Ambience />
       <SeaRoutes activeId={selectedId ?? hoveredId} />
       <CentralPlaza onClick={onBackToOverview} showLabel={!selectedId} />
@@ -70,6 +53,7 @@ export function IslandMapScene({ selectedId, hoveredId, onSelect, onHover, onBac
       ))}
 
       <CameraControls focus={focus} />
+      </TimeOfDayProvider>
     </Canvas>
   );
 }

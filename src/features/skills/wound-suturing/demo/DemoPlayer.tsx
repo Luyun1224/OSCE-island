@@ -55,7 +55,8 @@ export function DemoPlayer({ onExit, onPractice }: { onExit: () => void; onPract
   const [state, setState] = useState<WSState>(createInitialState);
   const [playing, setPlaying] = useState(true);
   const [speed, setSpeed] = useState(1);
-  const [voice, setVoice] = useState(false);
+  // 旁白預設開啟（由「觀看示範」按鈕進入，符合瀏覽器需使用者操作才能發聲的規定）
+  const [voice, setVoice] = useState(true);
   const [caption, setCaption] = useState('');
   const [bubble, setBubble] = useState<string | null>(null);
   const [highlight, setHighlight] = useState<string | undefined>();

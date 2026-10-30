@@ -1,20 +1,24 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { PALETTE, type TimeOfDay } from './timeOfDay';
 
 export const WATER_LEVEL = -1;
 
 /** Low Poly 動態海面：以頂點位移做出柔和波浪 */
-export function Ocean() {
+export function Ocean({ time }: { time: TimeOfDay }) {
   const mesh = useRef<THREE.Mesh>(null);
+  const mat = useRef<THREE.MeshStandardMaterial>(null);
+  const target = useMemo(() => new THREE.Color(), []);
   const { geometry, base } = useMemo(() => {
     const g = new THREE.PlaneGeometry(320, 320, 64, 64);
     g.rotateX(-Math.PI / 2);
     return { geometry: g, base: Float32Array.from(g.attributes.position.array) };
   }, []);
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, dt) => {
     const t = clock.getElapsedTime();
+    mat.current?.color.lerp(target.set(PALETTE[time].ocean), 1 - Math.exp(-dt * 2.2));
     const pos = geometry.attributes.position;
     for (let i = 0; i < pos.count; i++) {
       const x = base[i * 3];
@@ -26,7 +30,7 @@ export function Ocean() {
 
   return (
     <mesh ref={mesh} geometry={geometry} position={[0, WATER_LEVEL - 0.35, 0]} receiveShadow>
-      <meshStandardMaterial color="#4fb8dd" flatShading roughness={0.35} metalness={0.05} transparent opacity={0.92} />
+      <meshStandardMaterial ref={mat} color={PALETTE.day.ocean} flatShading roughness={0.35} metalness={0.05} transparent opacity={0.92} />
     </mesh>
   );
 }
