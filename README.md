@@ -1,6 +1,6 @@
 # OSCE Learning Islands｜醫學生 OSCE 學習探索島
 
-第一階段：3D 群島視覺骨架與基礎互動。
+3D 群島學習平台。目前已開放：**技能操作島 → 技能訓練中心 → 傷口縫合互動關卡**。
 
 🌐 線上版：https://luyun1224.github.io/osce-island/
 
@@ -18,6 +18,24 @@ npm run dev        # 開發模式 http://localhost:5173（同網段手機可用�
 npm run build      # 產出 dist/
 npm run preview    # 預覽正式版
 ```
+
+## 技能操作島：傷口縫合關卡
+
+路徑：群島 → 技能操作島 →「進入學習區」→ 技能訓練中心（`#/island/procedural-skills`）→ 傷口縫合（`#/skill/wound-suturing`）
+
+設計依據為《傷口縫合.pdf》（考生指引、評分表、考官指引、道具耗材、診間示意圖）；完整設計說明見 [`docs/wound-suturing-plan.md`](docs/wound-suturing-plan.md)。
+
+- **三種模式**：教學引導（逐層提示、即時回饋與修正選項）／自主練習（只記錄、結束後回饋）／OSCE 模擬挑戰（8 分鐘倒數，不提供即時答案）
+- **七個可自由切換的階段**：器材準備 → 無菌手套 → 消毒 → 鋪單 → 縫合 → 覆蓋 → 廢棄物
+- **縫合核心**：桌面版 3D 手部模型（可放大）＋ 傷口截面圖；選工具夾針 → 點選進／出針點 → 設定角度 → 沿弧拖曳穿針 → 拉線 → 打結小遊戲（三個結、方結判斷）→ 剪線；可逐針重設，針距即時量測。手機版改用 2D 俯視圖。
+- **評量**：10 項規準 0／1／2 分逐字依考官指引；數位評分標示「模擬練習評量」，整體表現 1–5 分保留「尚未評核（由教師評估）」，無法由網頁觀察的部分標示「需實體操作評核」。
+- **回饋**：流程回顧、個別化補強建議（可一鍵重練弱項）、10 項規準對照、前後練習比較（僅存於本機瀏覽器）。
+
+### 新增技能關卡
+
+1. 在 `src/features/skills/registry/skillRegistry.ts` 新增一筆技能並提供 `load()`
+2. 在 `src/features/skills/<skill-id>/` 建立：`caseData.ts`（SkillCase）、`engine.ts`（互動規則 reducer）、`rubric.ts`（AssessmentRubric）、`report.ts`（FeedbackReport）與各階段 UI
+3. 共用框架在 `src/features/training/`：`interactionEngine`（事件紀錄／計時／暫停）、`hintSystem`、`assessment`、`modes`、`storage` 與 `components/`（拖曳、提示面板、操作紀錄、回饋報告）
 
 ## 部署（GitHub Pages）
 
@@ -38,6 +56,11 @@ npm run preview    # 預覽正式版
 
 ```
 src/
+├── router.ts                       # hash 路由（GitHub Pages 相容）
+├── pages/IslandMapPage.tsx         # 群島地圖頁
+├── features/
+│   ├── training/                   # 可重複使用的技能訓練框架
+│   └── skills/                     # SkillRegistry、技能訓練中心、各技能關卡
 ├── types/island.ts                 # 型別：IslandConfig、IslandTheme、LearningModule…
 ├── data/islandData.ts              # IslandData：五座島設定、鏡頭參數（改內容只需改這裡）
 ├── components/
@@ -62,7 +85,7 @@ src/
 │       ├── IslandCard.tsx          # 導航選單中的島嶼卡片
 │       ├── IslandInfoPanel.tsx     # 島嶼介紹面板（桌機右側 / 手機底部抽屜）
 │       └── Overlay.tsx             # 頁首、操作提示、Toast
-├── App.tsx                         # 狀態：selectedId / hoveredId
+├── App.tsx                         # 路由表
 └── main.tsx
 ```
 
