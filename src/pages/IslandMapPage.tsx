@@ -4,6 +4,7 @@ import { NavigationMenu } from '../components/ui/NavigationMenu';
 import { IslandInfoPanel } from '../components/ui/IslandInfoPanel';
 import { AppHeader, ControlHint, Toast } from '../components/ui/Overlay';
 import { SceneControls, useTimeOfDayPreference } from '../components/ui/SceneControls';
+import { SiteCredit } from '../components/ui/SiteCredit';
 import { getIsland } from '../data/islandData';
 import type { IslandConfig, IslandId } from '../types/island';
 import { navigate } from '../router';
@@ -79,6 +80,11 @@ export function IslandMapPage({ initialIslandId = null }: { initialIslandId?: Is
           <ControlHint />
         </div>
       )}
+
+      {/* 製作單位與瀏覽次數（手機版在操作提示上方，開啟島嶼面板時隱藏） */}
+      <div className={`pointer-events-none absolute bottom-16 right-3 z-20 md:bottom-5 md:right-5 ${selected ? 'hidden md:block' : ''}`}>
+        <SiteCredit time={timeOfDay} />
+      </div>
 
       <Toast message={toast} />
     </div>

@@ -26,6 +26,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          # 瀏覽次數 API（Google Apps Script 網址），於 repo Settings → Secrets and variables → Actions → Variables 設定
+          VITE_VIEW_COUNTER_URL: ${{ vars.VIEW_COUNTER_URL }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
