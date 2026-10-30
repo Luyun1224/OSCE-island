@@ -28,7 +28,7 @@ function GloveDiagram({ decision }: { decision: string }) {
   );
 }
 
-export function GlovesStage({ state, dispatch }: StageProps) {
+export function GlovesStage({ state, dispatch, demoHighlight }: StageProps) {
   const g = state.gloves;
   const done = g.status === 'sterile' && g.progress >= GLOVE_DECISIONS.length;
   const decision = GLOVE_DECISIONS[Math.min(g.progress, GLOVE_DECISIONS.length - 1)];
@@ -88,8 +88,9 @@ export function GlovesStage({ state, dispatch }: StageProps) {
                 key={o.id}
                 type="button"
                 onClick={() => dispatch({ type: 'gloveDecision', optionId: o.id })}
-                className="rounded-xl border-2 border-slate-200 px-4 py-3 text-left text-sm font-medium text-slate-700 transition hover:border-blue-400 hover:bg-blue-50 active:scale-[0.99]"
+                className={`rounded-xl border-2 px-4 py-3 text-left text-sm font-medium text-slate-700 transition hover:border-blue-400 hover:bg-blue-50 active:scale-[0.99] ${demoHighlight === o.id ? 'border-emerald-500 bg-emerald-50 ring-4 ring-emerald-200' : 'border-slate-200'}`}
               >
+                {demoHighlight === o.id && <span className="mb-1 block text-[11px] font-black text-emerald-700">✓ 正確做法</span>}
                 {o.text}
               </button>
             ))}

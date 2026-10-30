@@ -21,7 +21,7 @@ import { SutureStage } from './stages/SutureStage';
 import { NarrationPanel } from './ui/NarrationPanel';
 import type { StageProps } from './ui/shared';
 
-function useIsMobile() {
+export function useIsMobile() {
   const q = '(max-width: 767px)';
   const [m, setM] = useState(() => window.matchMedia(q).matches);
   useEffect(() => {

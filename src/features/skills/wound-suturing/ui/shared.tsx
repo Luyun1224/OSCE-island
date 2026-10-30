@@ -10,6 +10,8 @@ export interface StageProps {
   /** 該階段已解鎖的提示層數（引導模式） */
   hintLevel: number;
   isMobile: boolean;
+  /** 示範模式：標示正確選項的 id */
+  demoHighlight?: string;
 }
 
 const HOTSPOT_ICON: Record<HotspotId, string> = { lamp: '💡', sleeve: '👕', 'antiseptic-bottle': '🧴', 'supply-table': '🗄️', 'mask-adjust': '😷' };
