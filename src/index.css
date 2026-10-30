@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  @apply bg-sky-100 font-sans text-slate-800 antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+canvas {
+  touch-action: none;
+}
