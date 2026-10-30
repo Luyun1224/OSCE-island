@@ -29,6 +29,15 @@ jobs:
         env:
           # 瀏覽次數 API（Google Apps Script 網址），於 repo Settings → Secrets and variables → Actions → Variables 設定
           VITE_VIEW_COUNTER_URL: ${{ vars.VIEW_COUNTER_URL }}
+      # 檢查瀏覽次數 API 是否可用（只讀取，不增加次數；失敗不影響部署）
+      - name: Check view counter
+        continue-on-error: true
+        run: |
+          url="${{ vars.VIEW_COUNTER_URL }}"
+          [ -z "$url" ] && url=$(grep -oE 'https://script\.google\.com/macros/s/[^'"'"']+/exec' src/config/site.ts | head -1)
+          res=$(curl -sSL -m 20 -D /tmp/h "$url?action=get" || true)
+          cors=$(grep -i '^access-control-allow-origin' /tmp/h | tail -1 | tr -d '\r')
+          echo "::notice title=View counter::response=${res:0:120} | ${cors:-no CORS header}"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
