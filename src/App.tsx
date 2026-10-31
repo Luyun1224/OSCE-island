@@ -1,8 +1,9 @@
-import { Suspense, lazy, useMemo, type ComponentType, type LazyExoticComponent } from 'react';
+import { Suspense, lazy, useEffect, useMemo, type ComponentType, type LazyExoticComponent } from 'react';
 import { ISLAND_MAP } from './data/islandData';
 import { IslandMapPage } from './pages/IslandMapPage';
 import { SkillCenterPage } from './features/skills/SkillCenterPage';
 import { getSkill } from './features/skills/registry/skillRegistry';
+import { logRouteVisit } from './lib/routeVisit';
 import { matchPath, navigate, useHashPath } from './router';
 import type { IslandId } from './types/island';
 
@@ -60,6 +61,7 @@ function SkillRoute({ skillId }: { skillId: string }) {
 
 export default function App() {
   const path = useHashPath();
+  useEffect(() => logRouteVisit(path), [path]);
 
   if (matchPath('/island/procedural-skills', path)) return <SkillCenterPage />;
 

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { logPractice } from '../../../lib/practiceLog';
 import { ConfirmDialog } from '../../training/components/Dialogs';
 import { useInteractionEngine } from '../../training/interactionEngine';
 import { formatClock, getTrainingModes } from '../../training/modes';
@@ -36,6 +37,10 @@ export function ClinicSession({ c, mode, onFinish, onExit }: { c: CasePackage; m
   useEffect(() => {
     if (chat.current) chat.current.scrollTop = chat.current.scrollHeight;
   }, [s.lines.length]);
+
+  useEffect(() => {
+    logPractice({ island: 'history-taking', module: 'start', itemId: c.id, itemTitle: `${c.code}：${c.title}`, mode });
+  }, [c, mode]);
 
   const reported = useRef(false);
   useEffect(() => {

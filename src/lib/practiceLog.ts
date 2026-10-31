@@ -5,7 +5,8 @@ import { SITE } from '../config/site';
  * - 匿名：每個瀏覽器一組隨機代碼，不收集姓名、學號或任何個資
  * - 使用 sendBeacon：學員關閉頁面也能送出；失敗時靜默略過，不影響練習
  */
-export type PracticeModule = 'skill' | 'demo' | 'sop-unit' | 'lab-game' | 'case';
+/** visit：進入島嶼／頁面；start：開始一次練習（與完成紀錄對照可算完成率） */
+export type PracticeModule = 'visit' | 'start' | 'skill' | 'demo' | 'sop-unit' | 'lab-game' | 'case';
 
 export interface PracticeLog {
   island: string;
@@ -57,4 +58,19 @@ export function logPractice(r: PracticeLog) {
     // 改用 fetch
   }
   fetch(url, { method: 'POST', mode: 'no-cors', body, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, keepalive: true }).catch(() => undefined);
+}
+
+const VISITED_KEY = 'osce-islands:visited';
+
+/** 瀏覽紀錄：同一個分頁工作階段內，同一頁只記一次，避免來回切換灌水 */
+export function logVisit(island: string, itemId: string, itemTitle: string, result?: string) {
+  try {
+    const seen: string[] = JSON.parse(window.sessionStorage.getItem(VISITED_KEY) || '[]');
+    const key = `${itemId}|${result ?? ''}`;
+    if (seen.includes(key)) return;
+    window.sessionStorage.setItem(VISITED_KEY, JSON.stringify([...seen, key]));
+  } catch {
+    // sessionStorage 不可用時照常記錄
+  }
+  logPractice({ island, module: 'visit', itemId, itemTitle, result });
 }

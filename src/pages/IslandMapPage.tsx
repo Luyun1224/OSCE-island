@@ -7,6 +7,7 @@ import { SceneControls, useTimeOfDayPreference } from '../components/ui/SceneCon
 import { SiteCredit } from '../components/ui/SiteCredit';
 import { getIsland } from '../data/islandData';
 import type { IslandConfig, IslandId } from '../types/island';
+import { logVisit } from '../lib/practiceLog';
 import { navigate } from '../router';
 
 export function IslandMapPage({ initialIslandId = null }: { initialIslandId?: IslandId | null }) {
@@ -17,6 +18,11 @@ export function IslandMapPage({ initialIslandId = null }: { initialIslandId?: Is
   const toastTimer = useRef<number>();
 
   const selected = getIsland(selectedId);
+
+  // 每座島嶼（含尚未開放）被點選都記錄，可看出學員對各島的興趣
+  useEffect(() => {
+    if (selected) logVisit(selected.id, `island:${selected.id}`, `${selected.title}（群島點選）`, selected.learningRoute ? 'open' : 'not-open');
+  }, [selected]);
 
   const backToOverview = useCallback(() => setSelectedId(null), []);
 
@@ -29,6 +35,7 @@ export function IslandMapPage({ initialIslandId = null }: { initialIslandId?: Is
   // 已開放學習區的島嶼導向其路由；其餘島嶼仍顯示規劃中提示
   const handleEnter = useCallback(
     (island: IslandConfig) => {
+      logVisit(island.id, `enter:${island.id}`, `${island.title}（進入學習區）`, island.learningRoute ? 'open' : 'not-open');
       if (island.learningRoute) navigate(island.learningRoute);
       else showToast(`「${island.buildingName}」學習區將於下一階段開放 🚧`);
     },

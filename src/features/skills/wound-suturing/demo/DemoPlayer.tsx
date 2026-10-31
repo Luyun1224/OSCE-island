@@ -127,6 +127,10 @@ export function DemoPlayer({ onExit, onPractice }: { onExit: () => void; onPract
 
   useEffect(() => () => narrator.stop(), [narrator]);
 
+  useEffect(() => {
+    logPractice({ island: 'procedural-skills', module: 'start', itemId: 'wound-suturing-demo', itemTitle: '傷口縫合｜正確示範', mode: 'demo' });
+  }, []);
+
   const togglePlay = () => {
     if (done) return goChapter(0);
     if (playing) narrator.stop();

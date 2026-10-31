@@ -103,5 +103,5 @@ src/features/history/
 - 引擎：`clinic/engine.ts`（問題解鎖、SP 提問觸發、子要項涵蓋、宣告式評分、回饋句），與案例內容無關。
 - 案例：`cases/case001-dizziness.ts`。SP 回答取自劇本；劇本未提供者為 `answer: null`，畫面顯示「待教案作者補充」。
 - 評分：15 項規準 0／1／2 判準逐字取自考官指引；以 `count`／`tiers` 規則計算；整體表現 1–5 分獨立、由教師評估。
-- 練習紀錄：完成後匿名寫入 Google 試算表（`docs/practice-log.md`）。
+- 練習紀錄：進入頁面、開始與完成練習皆匿名寫入 Google 試算表（`docs/practice-log.md`）。
 - 新增案例：複製案例檔格式並加入 `CASES` 清單即可。

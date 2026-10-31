@@ -53,6 +53,11 @@ export function TrainingSession({
   const { domain: state, events, elapsed, paused, finished } = engine.state;
   const isMobile = useIsMobile();
 
+  // 開始練習（與完成紀錄對照，可算出完成率）
+  useEffect(() => {
+    logPractice({ island: 'procedural-skills', module: 'start', itemId: 'wound-suturing', itemTitle: focusStep ? `傷口縫合（單項練習：${getStep(focusStep).title}）` : '傷口縫合', mode: mode.id });
+  }, [focusStep, mode.id]);
+
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const [contamination, setContamination] = useState<TrainingEvent | null>(null);
   const [narrating, setNarrating] = useState(false);
