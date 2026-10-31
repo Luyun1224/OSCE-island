@@ -4,7 +4,7 @@ import { CTIcon } from '../ui/Icons';
 import { GloveBadge, Hotspots, type StageProps } from '../ui/shared';
 
 /** 第三階段：無菌手套（閉合原則的決策點） */
-export function GlovesStage({ state, dispatch, mode }: StageProps) {
+export function GlovesStage({ state, dispatch, mode, demoHighlight }: StageProps) {
   const g = state.gloves;
   const d = STERILE_GLOVE_DECISIONS[g.progress];
   const options = useMemo(() => (d ? [...d.options].sort((a, b) => (a.id.length % 3) - (b.id.length % 3)) : []), [d]);
@@ -62,8 +62,9 @@ export function GlovesStage({ state, dispatch, mode }: StageProps) {
               <p className="mt-1 text-base font-black text-slate-800">{d.prompt}</p>
               <div className="mt-3 space-y-2">
                 {options.map((o) => (
-                  <button key={o.id} type="button" onClick={() => dispatch({ type: 'gloveDecision', decision: d.id, option: o.id })} className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-sm text-slate-700 hover:border-blue-400 hover:bg-blue-50">
+                  <button key={o.id} type="button" onClick={() => dispatch({ type: 'gloveDecision', decision: d.id, option: o.id })} className={`w-full rounded-xl border px-4 py-3 text-left text-sm text-slate-700 hover:border-blue-400 hover:bg-blue-50 ${demoHighlight === o.id ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-400' : 'border-slate-200 bg-white'}`}>
                     {o.text}
+                    {demoHighlight === o.id && <span className="ml-1 font-bold text-emerald-700">✓</span>}
                   </button>
                 ))}
               </div>

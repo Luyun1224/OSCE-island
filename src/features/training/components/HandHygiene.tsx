@@ -40,7 +40,10 @@ export function HandHygiene({
   blockedReason,
   result,
   onSubmit,
+  demoAreas,
 }: {
+  /** 示範模式：直接顯示已搓揉的部位 */
+  demoAreas?: HandAreaId[];
   title: string;
   /** 引導模式顯示部位名稱與步驟 */
   showLabels: boolean;
@@ -48,8 +51,10 @@ export function HandHygiene({
   result: { areas: HandAreaId[] } | null;
   onSubmit: (areas: HandAreaId[]) => void;
 }) {
-  const [dispensed, setDispensed] = useState(false);
-  const [progress, setProgress] = useState<Record<string, number>>({});
+  const [dispensedState, setDispensed] = useState(false);
+  const [progressState, setProgress] = useState<Record<string, number>>({});
+  const dispensed = demoAreas ? true : dispensedState;
+  const progress: Record<string, number> = demoAreas ? Object.fromEntries(demoAreas.map((a) => [a, 1])) : progressState;
   const [holding, setHolding] = useState<HandAreaId | null>(null);
   const timer = useRef<number>();
   const rubbed = HAND_AREAS.filter((h) => (progress[h.id] ?? 0) >= 1).map((h) => h.id);

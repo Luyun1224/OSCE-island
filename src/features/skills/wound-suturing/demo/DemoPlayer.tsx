@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNarrator } from '../../../training/useNarrator';
 import { DragDropProvider } from '../../../training/components/DragDrop';
 import { getTrainingModes } from '../../../training/modes';
 import type { TrainingModeId } from '../../../training/types';
@@ -21,31 +22,6 @@ const SPEEDS = [0.75, 1, 1.5, 2];
 const noop = () => undefined;
 
 const reduceAll = (s: WSState, actions: WSAction[]) => actions.reduce((acc, a) => woundSuturingReducer(acc, a).state, s);
-
-/** 語音旁白（瀏覽器內建 Web Speech API；不支援時自動略過） */
-function useNarrator() {
-  const supported = typeof window !== 'undefined' && 'speechSynthesis' in window;
-  const speak = useCallback(
-    (text: string, rate: number) =>
-      new Promise<void>((resolve) => {
-        if (!supported) return resolve();
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(text.replace(/[「」]/g, ''));
-        u.lang = 'zh-TW';
-        u.rate = Math.min(2, 0.95 * rate);
-        const voice = window.speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith('zh-tw')) ?? window.speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith('zh'));
-        if (voice) u.voice = voice;
-        u.onend = () => resolve();
-        u.onerror = () => resolve();
-        window.speechSynthesis.speak(u);
-      }),
-    [supported],
-  );
-  const stop = useCallback(() => {
-    if (supported) window.speechSynthesis.cancel();
-  }, [supported]);
-  return useMemo(() => ({ supported, speak, stop }), [supported, speak, stop]);
-}
 
 /** 正確示範模式：自動重播完整正確流程（動畫＋字幕＋可選語音旁白） */
 export function DemoPlayer({ onExit, onPractice }: { onExit: () => void; onPractice: (m: TrainingModeId) => void }) {

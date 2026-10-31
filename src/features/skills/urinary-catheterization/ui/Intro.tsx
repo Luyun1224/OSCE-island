@@ -124,7 +124,7 @@ const MODE_STYLE: Record<TrainingModeId, { icon: string; color: string; title: s
   challenge: { icon: '⏱️', color: '#dc2626', title: 'OSCE 模擬挑戰', desc: '8 分鐘倒數，不提供即時答案；病人依情境回應。可能傷害病人的操作仍會安全中止。結束後顯示模擬評核結果。' },
 };
 
-export function ModeSelect({ onSelect, onBack }: { onSelect: (m: TrainingModeId) => void; onBack: () => void }) {
+export function ModeSelect({ onSelect, onDemo, onBack }: { onSelect: (m: TrainingModeId) => void; onDemo: () => void; onBack: () => void }) {
   const modes = getTrainingModes(sc.stationMinutes);
   return (
     <div className="h-full overflow-y-auto bg-gradient-to-b from-teal-50 via-slate-50 to-sky-50">
@@ -133,8 +133,21 @@ export function ModeSelect({ onSelect, onBack }: { onSelect: (m: TrainingModeId)
           ← 回到情境說明
         </button>
         <h1 className="mt-4 text-2xl font-black text-slate-800">選擇訓練模式</h1>
-        <p className="mt-1 text-sm text-slate-500">三種模式使用同一個模擬診間與相同的評分規準。建議依序挑戰。</p>
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
+        <p className="mt-1 text-sm text-slate-500">建議先觀看正確示範，再依序挑戰三種練習模式。所有模式使用同一個模擬診間與相同的評分規準。</p>
+        <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <button type="button" onClick={onDemo} className="group relative flex flex-col overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-50 to-white p-5 text-left shadow-glass ring-2 ring-emerald-300 transition hover:-translate-y-1 hover:ring-emerald-400">
+            <span className="absolute right-4 top-4 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white">建議先看</span>
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-2xl">🎬</span>
+            <span className="mt-3 text-lg font-black text-slate-800">正確示範模式</span>
+            <span className="text-[11px] font-bold text-emerald-700">Demonstration</span>
+            <span className="mt-2 flex-1 text-[13px] leading-relaxed text-slate-600">以動畫完整播放 12 個階段的正確流程：病人說明、手部衛生、導尿包無菌準備、手套、消毒鋪單、潤滑、遇阻力的正確處置、水球定位、尿袋固定與廢棄物，附字幕與正確觀念。</span>
+            <span className="mt-3 flex flex-wrap gap-1 text-[10px] font-bold">
+              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">完整流程</span>
+              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">字幕＋語音旁白</span>
+              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-emerald-800">可暫停 / 倍速 / 跳章</span>
+            </span>
+            <span className="mt-4 rounded-xl bg-emerald-600 py-2 text-center text-sm font-bold text-white">觀看示範</span>
+          </button>
           {(Object.keys(modes) as TrainingModeId[]).map((id) => {
             const m = modes[id];
             const st = MODE_STYLE[id];

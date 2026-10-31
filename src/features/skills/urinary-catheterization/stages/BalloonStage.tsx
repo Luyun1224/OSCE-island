@@ -28,10 +28,11 @@ function Port({ id, label, sub, active }: { id: 'balloon' | 'drain'; label: stri
  * BalloonSafetyGate：未見尿、未置入至末端時，所有水球操作都會被阻擋並記錄
  * 打水量以空針刻度拖曳，教案容量要求保留在 rubricConfig。
  */
-export function BalloonStage({ state, dispatch, mode }: StageProps) {
+export function BalloonStage({ state, dispatch, mode, demo }: StageProps) {
   const c = state.catheter;
   const gate = balloonGateOpen(state);
-  const [plunger, setPlunger] = useState(0);
+  const [plungerState, setPlunger] = useState(0);
+  const plunger = demo ? state.catheter.balloonMl : plungerState;
   const bar = useRef<HTMLDivElement>(null);
   const pullRef = useRef<{ y: number; t: number } | null>(null);
   useDropZone('ct-port-balloon', (p) => p.kind === 'ct-syringe' && dispatch({ type: 'syringePort', port: 'balloon' }));

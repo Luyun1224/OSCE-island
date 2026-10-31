@@ -26,7 +26,7 @@ export function analyzeStroke(pts: P[]) {
 }
 
 /** 第四階段（上）：消毒（棉枝在模型上實際拖曳） */
-export function DisinfectStage({ state, dispatch, mode }: StageProps) {
+export function DisinfectStage({ state, dispatch, mode, demo }: StageProps) {
   const svg = useRef<SVGSVGElement>(null);
   const [holding, setHolding] = useState(false);
   const [path, setPath] = useState<P[]>([]);
@@ -73,13 +73,17 @@ export function DisinfectStage({ state, dispatch, mode }: StageProps) {
               style: { cursor: holding ? 'crosshair' : 'default' },
             }}
           >
+            {demo &&
+              state.strokes.map((_, i) => (
+                <path key={`demo${i}`} d={`M160 228 C ${150 + i * 10} 200, ${140 + i * 20} 160, ${136 + i * 24} 104`} fill="none" stroke="#b45309" strokeWidth="5" strokeLinecap="round" opacity="0.45" className="animate-fade-up" />
+              ))}
             {trails.map((t, i) => (
               <polyline key={i} points={t.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke="#b45309" strokeWidth="5" strokeLinecap="round" opacity="0.35" />
             ))}
             {path.length > 1 && <polyline points={path.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke="#92400e" strokeWidth="6" strokeLinecap="round" opacity="0.7" />}
             {path.length > 0 && <circle cx={path[path.length - 1].x} cy={path[path.length - 1].y} r="7" fill="#b45309" stroke="#fff" />}
           </MaleModel>
-          {!holding && <p className="pointer-events-none absolute inset-x-0 bottom-3 text-center text-[12px] font-bold text-slate-500">先在右側取一支棉枝，再在模型上拖曳消毒</p>}
+          {!holding && !demo && <p className="pointer-events-none absolute inset-x-0 bottom-3 text-center text-[12px] font-bold text-slate-500">先在右側取一支棉枝，再在模型上拖曳消毒</p>}
         </div>
         <div className="space-y-2">
           <button

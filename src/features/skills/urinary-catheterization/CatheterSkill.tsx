@@ -6,13 +6,14 @@ import { loadAttempts } from '../../training/storage';
 import type { FeedbackReport, TrainingModeId } from '../../training/types';
 import { CATHETER_CASE, type StepId } from './caseData';
 import { CatheterSession } from './CatheterSession';
+import { CatheterDemoPlayer } from './demo/DemoPlayer';
 import { ModeSelect, ScenarioIntro } from './ui/Intro';
 
-type Screen = { name: 'intro' } | { name: 'mode' } | { name: 'training'; mode: TrainingModeId; focus: StepId | null; key: number } | { name: 'report'; report: FeedbackReport };
+type Screen = { name: 'intro' } | { name: 'mode' } | { name: 'demo' } | { name: 'training'; mode: TrainingModeId; focus: StepId | null; key: number } | { name: 'report'; report: FeedbackReport };
 
 const MODES = getTrainingModes(CATHETER_CASE.scenario.stationMinutes);
 
-/** CATHETER QUEST｜導尿管置入：情境介紹 → 模式選擇 → 模擬診間 → 回饋報告與操作回放 */
+/** CATHETER QUEST｜導尿管置入：情境介紹 → 模式選擇（正確示範／三種練習）→ 模擬診間 → 回饋報告與操作回放 */
 export default function CatheterSkill() {
   const [screen, setScreen] = useState<Screen>({ name: 'intro' });
   const exit = useCallback(() => navigate('/island/procedural-skills'), []);
@@ -23,7 +24,9 @@ export default function CatheterSkill() {
     case 'intro':
       return <ScenarioIntro onContinue={() => setScreen({ name: 'mode' })} onBack={exit} />;
     case 'mode':
-      return <ModeSelect onSelect={(m) => start(m)} onBack={() => setScreen({ name: 'intro' })} />;
+      return <ModeSelect onSelect={(m) => start(m)} onDemo={() => setScreen({ name: 'demo' })} onBack={() => setScreen({ name: 'intro' })} />;
+    case 'demo':
+      return <CatheterDemoPlayer onExit={() => setScreen({ name: 'mode' })} onPractice={(m) => start(m)} />;
     case 'training':
       return <CatheterSession key={screen.key} mode={MODES[screen.mode]} focusStep={screen.focus} onFinish={onFinish} onExit={exit} />;
     case 'report':

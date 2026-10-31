@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useDropState } from '../../../training/components/DragDrop';
+import type { HandAreaId } from '../../../training/sterile';
 import type { TrainingModeConfig } from '../../../training/types';
 import { HOTSPOTS, type HotspotId } from '../caseData';
 import type { CTAction, CTState } from '../engine';
@@ -10,6 +11,12 @@ export interface StageProps {
   mode: TrainingModeConfig;
   hintLevel: number;
   isMobile: boolean;
+  /** 示範模式：標示正確選項的 id */
+  demoHighlight?: string;
+  /** 示範模式：手部衛生已搓揉的部位 */
+  demoAreas?: HandAreaId[];
+  /** 示範模式（畫面唯讀，顯示示意軌跡） */
+  demo?: boolean;
 }
 
 export function DropArea({ id, title, sub, children, className }: { id: string; title: string; sub?: string; children: ReactNode; className?: string }) {
