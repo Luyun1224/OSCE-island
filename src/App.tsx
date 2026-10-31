@@ -12,8 +12,19 @@ import type { IslandId } from './types/island';
  *  #/map/:islandId            群島地圖並聚焦指定島嶼
  *  #/island/procedural-skills 技能訓練中心
  *  #/skill/:skillId           技能訓練關卡
+ *  #/history/...              病史詢問島 HISTORY QUEST
  */
 const lazyCache = new Map<string, LazyExoticComponent<ComponentType>>();
+const HistoryQuestApp = lazy(() => import('./features/history/HistoryQuestApp'));
+
+function Loading({ text }: { text: string }) {
+  return (
+    <div className="flex h-full items-center justify-center text-sm font-medium text-slate-500">
+      <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-teal-600 border-t-transparent" />
+      {text}
+    </div>
+  );
+}
 
 function SkillRoute({ skillId }: { skillId: string }) {
   const skill = getSkill(skillId);
@@ -51,6 +62,14 @@ export default function App() {
   const path = useHashPath();
 
   if (matchPath('/island/procedural-skills', path)) return <SkillCenterPage />;
+
+  if (path === '/history' || path.startsWith('/history/')) {
+    return (
+      <Suspense fallback={<Loading text="正在前往病史偵探學院…" />}>
+        <HistoryQuestApp path={path} />
+      </Suspense>
+    );
+  }
 
   const skill = matchPath('/skill/:skillId', path);
   if (skill) return <SkillRoute key={skill.skillId} skillId={skill.skillId} />;

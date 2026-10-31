@@ -1,4 +1,5 @@
 import type { IslandConfig, LearningModuleType } from '../../types/island';
+import { ISLANDS } from '../../data/islandData';
 
 interface IslandInfoPanelProps {
   island: IslandConfig;
@@ -50,7 +51,7 @@ export function IslandInfoPanel({ island, onClose, onEnter }: IslandInfoPanelPro
           <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3 text-[12px] leading-relaxed text-slate-600">
             🚧 <span className="font-bold">此島嶼的學習區尚未開放</span>，內容正在規劃中。以下為預定的學習方向。
             <br />
-            目前已開放：🛠️ 技能操作島 › 傷口縫合
+            目前已開放：{ISLANDS.filter((i) => i.learningRoute).map((i) => `${i.icon} ${i.title}`).join('、')}
           </div>
         )}
         <div className="flex items-center gap-2 rounded-xl p-2.5 text-sm" style={{ background: `${island.themeColor}14` }}>

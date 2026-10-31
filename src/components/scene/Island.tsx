@@ -104,7 +104,7 @@ export function Island({ data, selected, hovered, dimmed, onSelect, onHover }: I
 
       <group ref={lift} onClick={handleClick} onPointerOver={handleOver} onPointerOut={handleOut}>
         <IslandBase radius={data.radius} ground={data.theme.ground} />
-        <Buildings theme={data.theme} />
+        <Buildings theme={data.theme} interactive={selected} onRequestSelect={() => onSelect(data.id)} />
       </group>
 
       {/* 浮動島名標籤 */}

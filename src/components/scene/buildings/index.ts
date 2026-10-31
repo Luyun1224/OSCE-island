@@ -8,6 +8,10 @@ import { ProceduralSkillsBuildings } from './ProceduralSkillsBuildings';
 
 export interface BuildingSetProps {
   theme: IslandTheme;
+  /** 島嶼已被選取：島上建築可點擊進入 */
+  interactive?: boolean;
+  /** 島嶼未選取時點到建築：先選取島嶼 */
+  onRequestSelect?: () => void;
 }
 
 /**
