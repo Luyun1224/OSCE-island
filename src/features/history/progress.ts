@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
 import type { ActivityResult } from './types';
+import { logPractice, type PracticeModule } from '../../lib/practiceLog';
 
 /**
  * HISTORY QUEST 本機學習紀錄（只存在學員自己的瀏覽器，不上傳、不含個資）
@@ -42,7 +43,17 @@ function save(p: ProgressState) {
 
 const keyOf = (kind: RunRecord['kind'], id: string) => `${kind}:${id}`;
 
-export function recordRun(kind: RunRecord['kind'], id: string, results: ActivityResult[]) {
+export interface RunMeta {
+  title: string;
+  mode?: string;
+  durationSec?: number;
+  result?: string;
+  detail?: string;
+}
+
+const MODULE: Record<RunRecord['kind'], PracticeModule> = { unit: 'sop-unit', game: 'lab-game', case: 'case' };
+
+export function recordRun(kind: RunRecord['kind'], id: string, results: ActivityResult[], meta?: RunMeta) {
   const p = loadProgress();
   const score = results.reduce((s, r) => s + r.score, 0);
   const max = results.reduce((s, r) => s + r.max, 0);
@@ -57,6 +68,18 @@ export function recordRun(kind: RunRecord['kind'], id: string, results: Activity
   };
   p.history = [{ kind, id, score, max, at, notes: results.flatMap((r) => r.notes).slice(0, 8) }, ...p.history].slice(0, MAX_HISTORY);
   save(p);
+  logPractice({
+    island: 'history-taking',
+    module: MODULE[kind],
+    itemId: id,
+    itemTitle: meta?.title ?? id,
+    mode: meta?.mode,
+    score,
+    max,
+    durationSec: meta?.durationSec,
+    result: meta?.result ?? 'completed',
+    detail: meta?.detail,
+  });
   return p;
 }
 

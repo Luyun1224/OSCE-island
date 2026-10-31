@@ -14,6 +14,7 @@ import { SutureStage } from '../stages/SutureStage';
 import { useIsMobile } from '../TrainingSession';
 import type { StageProps } from '../ui/shared';
 import { DEMO_CHAPTERS, actionsBefore, frameAction, patientLine } from './demoScript';
+import { logPractice } from '../../../../lib/practiceLog';
 
 const GUIDED = getTrainingModes(WOUND_SUTURING_CASE.scenario.stationMinutes).guided;
 const SPEEDS = [0.75, 1, 1.5, 2];
@@ -99,6 +100,7 @@ export function DemoPlayer({ onExit, onPractice }: { onExit: () => void; onPract
       } else {
         setDone(true);
         setPlaying(false);
+        logPractice({ island: 'procedural-skills', module: 'demo', itemId: 'wound-suturing-demo', itemTitle: '傷口縫合｜正確示範（看完）', result: 'watched' });
       }
       return;
     }

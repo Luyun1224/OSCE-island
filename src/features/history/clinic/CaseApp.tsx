@@ -25,7 +25,13 @@ export function CaseApp({ c }: { c: CasePackage }) {
   const onFinish = useCallback(
     (result: ClinicResult) => {
       const ev = evaluateCase(c, result.state);
-      recordRun('case', c.id, [{ activityId: c.id, score: ev.total, max: ev.max, notes: ev.items.filter((r) => r.score < 2).map(feedbackSentence) }]);
+      recordRun('case', c.id, [{ activityId: c.id, score: ev.total, max: ev.max, notes: ev.items.filter((r) => r.score < 2).map(feedbackSentence) }], {
+        title: `${c.code}：${c.title}`,
+        mode: result.mode,
+        durationSec: result.durationSec,
+        result: result.endReason,
+        detail: ev.items.map((r) => `${r.item.no}:${r.score}`).join(' '),
+      });
       setScreen({ name: 'report', result });
     },
     [c],
@@ -107,17 +113,6 @@ export function CaseApp({ c }: { c: CasePackage }) {
         </div>
       </section>
 
-      <section className="mt-5 rounded-3xl bg-violet-50 p-5 ring-1 ring-violet-200">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h2 className="text-base font-black text-violet-900">教師專區：評分規準與教案審核</h2>
-            <p className="text-[13px] text-violet-800">15 項評分規準、題目對應與 {c.pending.length} 項待補充內容，可在審核頁檢視、修改並匯出。</p>
-          </div>
-          <button type="button" onClick={() => navigate(`/history/clinic/${c.id}/rubric`)} className="rounded-2xl bg-violet-600 px-4 py-2 text-sm font-bold text-white">
-            開啟規準審核 →
-          </button>
-        </div>
-      </section>
     </HQShell>
   );
 }

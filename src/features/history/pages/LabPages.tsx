@@ -61,6 +61,7 @@ export function GamePage({ gameId }: { gameId: string }) {
   const game = getGame(gameId);
   const [result, setResult] = useState<ActivityResult | null>(null);
   const [runKey, setRunKey] = useState(0);
+  const [startedAt, setStartedAt] = useState(() => Date.now());
   if (!game) {
     return (
       <HQShell crumbs={[{ label: 'HISTORY QUEST', to: '/history' }, { label: '找不到遊戲' }]}>
@@ -69,7 +70,7 @@ export function GamePage({ gameId }: { gameId: string }) {
     );
   }
   const done = (r: ActivityResult) => {
-    recordRun('game', game.id, [r]);
+    recordRun('game', game.id, [r], { title: `遊戲 ${game.letter}：${game.title}`, durationSec: (Date.now() - startedAt) / 1000 });
     setResult(r);
     window.scrollTo?.(0, 0);
   };
@@ -132,6 +133,7 @@ export function GamePage({ gameId }: { gameId: string }) {
               onClick={() => {
                 setResult(null);
                 setRunKey((k) => k + 1);
+                setStartedAt(Date.now());
               }}
             >
               ↺ 再玩一次

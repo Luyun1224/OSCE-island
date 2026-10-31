@@ -14,6 +14,7 @@ export function UnitPage({ unitId }: { unitId: string }) {
   const [stage, setStage] = useState<Stage>({ name: 'learn' });
   const [results, setResults] = useState<ActivityResult[]>([]);
   const [runKey, setRunKey] = useState(0);
+  const [startedAt, setStartedAt] = useState(() => Date.now());
 
   if (!unit) {
     return (
@@ -33,7 +34,7 @@ export function UnitPage({ unitId }: { unitId: string }) {
     if (stage.name === 'practice' && stage.index < unit.activities.length - 1) {
       setStage({ name: 'practice', index: stage.index + 1 });
     } else {
-      recordRun('unit', unit.id, all);
+      recordRun('unit', unit.id, all, { title: `單元 ${unit.order}：${unit.title}`, durationSec: (Date.now() - startedAt) / 1000 });
       setStage({ name: 'result' });
     }
     window.scrollTo?.(0, 0);
@@ -42,6 +43,7 @@ export function UnitPage({ unitId }: { unitId: string }) {
   const restart = (toLearn = false) => {
     setResults([]);
     setRunKey((k) => k + 1);
+    setStartedAt(Date.now());
     setStage(toLearn ? { name: 'learn' } : { name: 'practice', index: 0 });
   };
 

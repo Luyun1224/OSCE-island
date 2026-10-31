@@ -5,14 +5,13 @@ import { getUnit } from '../data/sopUnits';
 import type { CasePackage } from '../types';
 import type { ClinicResult } from './ClinicSession';
 import { coveredSubs, evaluateCase, feedbackSentence } from './engine';
-import { applyOverrides } from './rubricOverrides';
 
 const MODE_TITLE = { guided: '引導式練習', independent: '自主問診', challenge: 'OSCE 模擬挑戰（8 分鐘）' } as const;
 const SCORE_LABEL = ['沒有做到', '部分做到', '完全做到'];
 
 /** 個別化學習報告：依學生實際的問句與說明產生 */
 export function CaseReport({ caseData, result, onRetry, onBack }: { caseData: CasePackage; result: ClinicResult; onRetry: () => void; onBack: () => void }) {
-  const c = applyOverrides(caseData);
+  const c = caseData;
   const { state, durationSec, endReason, mode } = result;
   const ev = evaluateCase(c, state);
   const covered = coveredSubs(c, state);
@@ -215,7 +214,12 @@ export function CaseReport({ caseData, result, onRetry, onBack }: { caseData: Ca
           <p>「鐵劑空腹使用」「與果汁併服」為本教案的評分要求與例句；正式衛教內容需由臨床教師依最新用藥指引、病人耐受性與個別情況確認，不宜直接套用於所有病人。</p>
           {saidStatements.some((x) => x.source === 'clinical') && <p className="mt-1">你使用的說法中，標示為「臨床衛教」者（例如飲食建議）為一般衛教內容，同樣需教師確認。</p>}
         </div>
-        <p className="mt-2 text-[12px] text-slate-400">教案保留項目：{c.pending.length} 項待教案作者補充或教師確認（見規準審核頁）。</p>
+        <div className="mt-2 text-[12px] text-slate-500">
+          <p className="font-bold">教案保留項目（待教案作者補充或教師確認）</p>
+          {c.pending.map((p) => (
+            <p key={p}>• {p}</p>
+          ))}
+        </div>
       </section>
 
       <div className="mt-5 flex flex-wrap gap-2">

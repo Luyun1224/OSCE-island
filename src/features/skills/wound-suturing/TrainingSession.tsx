@@ -7,6 +7,7 @@ import { useHintSystem } from '../../training/hintSystem';
 import { useInteractionEngine } from '../../training/interactionEngine';
 import { formatClock } from '../../training/modes';
 import { saveAttempt } from '../../training/storage';
+import { logPractice } from '../../../lib/practiceLog';
 import type { FeedbackReport, TrainingEvent, TrainingModeConfig } from '../../training/types';
 import { WOUND_SUTURING_CASE, getStep, type StepId } from './caseData';
 import { createFocusState, createInitialState, woundSuturingReducer } from './engine';
@@ -88,6 +89,18 @@ export function TrainingSession({
     reported.current = true;
     const report = buildReport({ state, events, mode: mode.id, durationSec: elapsed, endReason: finished, focusStepId: focusStep });
     saveAttempt(toAttemptRecord(report, state));
+    logPractice({
+      island: 'procedural-skills',
+      module: 'skill',
+      itemId: 'wound-suturing',
+      itemTitle: focusStep ? `傷口縫合（單項練習：${getStep(focusStep).title}）` : '傷口縫合',
+      mode: mode.id,
+      score: report.assessment.total,
+      max: report.assessment.max,
+      durationSec: elapsed,
+      result: finished,
+      detail: report.assessment.items.map((i) => `${i.id}:${i.score}`).join(' '),
+    });
     onFinish(report);
   }, [finished, state, events, mode.id, elapsed, focusStep, onFinish]);
 
