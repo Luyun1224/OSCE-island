@@ -5,6 +5,7 @@ import { FormativeNote, HQShell, ScoreBar } from '../components/Shell';
 import { LAB_GAMES, getGame } from '../data/labGames';
 import { SOP_UNITS, getUnit } from '../data/sopUnits';
 import { clearProgress, getBest, useProgress } from '../progress';
+import { CASES, getCase } from '../cases/case001-dizziness';
 
 /** 04 問診能力分析中心：練習歷程、弱項與建議 */
 export function ReviewPage() {
@@ -67,8 +68,20 @@ export function ReviewPage() {
             })}
           </div>
 
-          <h2 className="mt-6 text-lg font-black text-slate-800">虛擬診間與 OSCE 規準</h2>
-          <p className="mt-1 text-[13px] text-slate-500">案例問診紀錄、遺漏的重要病史與評分規準對照，將在虛擬病人診間開放後顯示。</p>
+          <h2 className="mt-6 text-lg font-black text-slate-800">虛擬病人診間</h2>
+          <div className="mt-2 space-y-2.5">
+            {CASES.map((cs) => {
+              const b = getBest('case', cs.id, progress);
+              return (
+                <button key={cs.id} type="button" onClick={() => navigate(`/history/clinic/${cs.id}`)} className="block w-full rounded-2xl p-2 text-left hover:bg-slate-50">
+                  <p className="text-[13px] font-bold text-slate-700">
+                    🩺 {cs.code}：{cs.title} {b && <span className="text-[11px] font-medium text-slate-400">（{b.attempts} 次，15 項規準）</span>}
+                  </p>
+                  {b ? <ScoreBar score={b.score} max={b.max} /> : <p className="text-[12px] text-slate-400">尚未問診</p>}
+                </button>
+              );
+            })}
+          </div>
         </section>
       </div>
 
@@ -119,7 +132,8 @@ export function ReviewPage() {
         ) : (
           <ul className="mt-3 divide-y divide-slate-100">
             {recent.map((h, i) => {
-              const name = h.kind === 'unit' ? `單元 ${getUnit(h.id)?.order}：${getUnit(h.id)?.title}` : `遊戲 ${getGame(h.id)?.letter}：${getGame(h.id)?.title}`;
+              const name =
+                h.kind === 'unit' ? `單元 ${getUnit(h.id)?.order}：${getUnit(h.id)?.title}` : h.kind === 'game' ? `遊戲 ${getGame(h.id)?.letter}：${getGame(h.id)?.title}` : `${getCase(h.id)?.code}：${getCase(h.id)?.title}`;
               return (
                 <li key={i} className="grid grid-cols-[1fr_8rem] items-center gap-3 py-2 text-[13px] md:grid-cols-[9rem_1fr_10rem]">
                   <span className="hidden text-slate-400 md:block">{new Date(h.at).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>

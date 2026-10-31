@@ -32,7 +32,7 @@ export const ISLANDS: IslandConfig[] = [
     modules: [
       { id: 'hq-academy', title: '01 問診 SOP 學院（六單元）', type: 'checklist', status: 'available' },
       { id: 'hq-lab', title: '02 問診技巧訓練場（四種遊戲）', type: 'quiz', status: 'available' },
-      { id: 'hq-clinic', title: '03 虛擬病人診間', type: 'case', status: 'planned' },
+      { id: 'hq-clinic', title: '03 虛擬病人診間（Case 001 頭暈）', type: 'case', status: 'available' },
       { id: 'hq-review', title: '04 問診能力分析中心', type: 'checklist', status: 'available' },
     ],
   },

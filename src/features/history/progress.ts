@@ -8,7 +8,7 @@ const KEY = 'osce-islands:history-progress';
 const MAX_HISTORY = 40;
 
 export interface RunRecord {
-  kind: 'unit' | 'game';
+  kind: 'unit' | 'game' | 'case';
   id: string;
   score: number;
   max: number;

@@ -44,7 +44,7 @@ export const HQ_BUILDINGS: HQBuilding[] = [
     description: '選擇病例，與虛擬標準化病人進行自由問診、追問、判讀檢驗並說明病情。',
     icon: '🩺',
     route: '/history/clinic',
-    status: 'building',
+    status: 'open',
     color: '#2563eb',
   },
   {

@@ -223,43 +223,61 @@ export interface LabGame {
 }
 
 /* ------------------------------------------------------------------ */
-/* 案例包（Phase 4 起使用；正式教案為受限資料，不進公開 repo）            */
+/* 案例包（虛擬病人診間）                                                  */
 /* ------------------------------------------------------------------ */
 
-export type QuestionTopic =
-  | 'opening'
-  | 'chief-complaint'
-  | 'hpi'
-  | 'ob-gyn'
-  | 'bleeding'
-  | 'past-history'
-  | 'surgery'
-  | 'medication'
-  | 'family'
-  | 'social'
-  | 'explanation';
+export interface CaseTopic {
+  id: string;
+  label: string;
+  icon: string;
+  /** 引導模式顯示的問診提示 */
+  hint: string;
+  /** 是否為病情說明（說明句，而非問句） */
+  explanation?: boolean;
+}
 
+/** 問題節點：學生的一個問句與 SP 的回答 */
 export interface QuestionNode {
   id: string;
-  topic: QuestionTopic;
-  /** 學生可選擇的問句（同義變體） */
-  variants: string[];
+  topic: string;
+  text: string;
   /** SP 回答；null 表示教案未提供明確答案（待教案作者補充） */
   answer: string | null;
   mood?: Mood;
-  /** 條件式追問：需先問過這些節點才會出現 */
+  /** 條件式追問：需先問過其中任一節點才會出現 */
   unlockAfter?: string[];
-  /** 對應評分要項（例如 'R5.cycle'） */
-  rubricLinks?: string[];
-  /** 問了之後病歷資料板記錄的線索 */
+  /** 涵蓋的評分子要項 */
+  covers?: string[];
+  /** 病歷資料板記錄 */
   record?: string;
+  /** 引導模式的觀念說明 */
+  note?: string;
 }
 
-/** SP 主動提問：滿足條件時觸發 */
+/** 病情說明節點：學生要對病人說的話 */
+export interface StatementNode {
+  id: string;
+  topic: string;
+  group: string;
+  text: string;
+  covers?: string[];
+  /** 不正確或不適當的說法 */
+  incorrect?: boolean;
+  feedback: string;
+  mood?: Mood;
+  /** 屬於原教案評分要求，或一般臨床衛教（需教師確認） */
+  source: 'case' | 'clinical';
+}
+
+/** SP 主動提問 */
 export interface SpPrompt {
   id: string;
   text: string;
-  trigger: { afterAny?: string[]; afterAll?: string[]; afterExplanation?: string[] };
+  /** 觸發：說過任一說明句，或已詢問的問題數達到門檻 */
+  afterStatements?: string[];
+  afterQuestionCount?: number;
+  /** 視為已回應：之後說過任一句 */
+  answeredBy: string[];
 }
 
 export interface LabItem {
@@ -268,6 +286,9 @@ export interface LabItem {
   value: string;
   unit: string;
   reference: string;
+  low: number;
+  high: number;
+  numeric: number;
   /** 項目基本意義（不含本案診斷結論） */
   meaning: string;
 }
@@ -277,26 +298,50 @@ export interface RubricLevel {
   text: string;
 }
 
+/** 評分子要項：例如月經史的週期／天數／棉墊量 */
+export interface SubItem {
+  id: string;
+  label: string;
+}
+
+/**
+ * 宣告式評分規則
+ * count：涵蓋子要項數 ≥ full 得 2 分、≥ partial 得 1 分
+ * tiers：涵蓋 full 中任一項得 2 分；否則涵蓋 partial 中任一項得 1 分
+ */
+export type RubricRule = { type: 'count'; subs: string[]; full: number; partial?: number } | { type: 'tiers'; full: string[]; partial?: string[] };
+
 export interface CaseRubricItem {
   id: string;
+  no: number;
   title: string;
   levels: RubricLevel[];
-  /** 子要項：例如月經史的週期／天數／棉墊量 */
-  subItems?: { id: string; label: string }[];
+  rule: RubricRule;
+  /** 建議重練的 SOP 單元 */
+  units: string[];
+  /** 對應規則的補充說明（待審核之處） */
+  mappingNote?: string;
   review: ReviewMeta;
 }
 
 export interface CasePackage {
   id: string;
+  code: string;
   title: string;
   version: string;
   license: { publicApproved: boolean; approvedBy?: string; note?: string };
-  patient: PatientLook & { setting: string; posture: string; baselineMood: Mood; emotionIntensity: number };
-  station: { minutes: number; tasks: string[]; notes: string[] };
+  patient: PatientLook & { fullName: string; birthday: string; occupation: string; setting: string; posture: string; baselineMood: Mood; emotionIntensity: number; behavior: string[] };
+  candidate: { background: string; tasks: string[]; minutes: number; notes: string[] };
+  openingLine: string;
+  topics: CaseTopic[];
   questions: QuestionNode[];
+  statements: StatementNode[];
   spPrompts: SpPrompt[];
-  labs: LabItem[];
+  labs: { title: string; note: string; items: LabItem[] };
+  subItems: SubItem[];
   rubric: CaseRubricItem[];
-  globalRating: { min: 1; max: 5; separateFromTotal: true };
+  globalRating: { labels: string[]; separateFromTotal: true };
+  teachingReference: { title: string; items: string[] }[];
+  pending: string[];
   review: ReviewMeta;
 }
