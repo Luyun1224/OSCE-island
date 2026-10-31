@@ -95,11 +95,15 @@ export type RubricScore = 0 | 1 | 2;
  */
 export type Observability = 'digital' | 'proxy';
 
+/** 逐字保留教案的評分說明；教案只有 0 / 2 的項目不提供 1 分 */
+export type RubricCriteria = Partial<Record<RubricScore, string>>;
+
 export interface RubricItemDef<C> {
   id: number;
   title: string;
-  /** 逐字保留教案的 0 / 1 / 2 說明 */
-  criteria: Record<RubricScore, string>;
+  criteria: RubricCriteria;
+  /** 教案允許的分數（預設 0 / 1 / 2） */
+  allowedScores?: RubricScore[];
   observability: Observability;
   physicalNote?: string;
   stepIds: string[];
@@ -109,7 +113,8 @@ export interface RubricItemDef<C> {
 export interface RubricItemResult {
   id: number;
   title: string;
-  criteria: Record<RubricScore, string>;
+  criteria: RubricCriteria;
+  allowedScores: RubricScore[];
   score: RubricScore;
   evidence: string[];
   missing: string[];
@@ -160,6 +165,17 @@ export interface FeedbackReport {
   suggestions: FeedbackSuggestion[];
   physicalChecks: string[];
   events: TrainingEvent[];
+  /** 以下為選填，未提供時沿用傷口縫合的呈現 */
+  skillTitle?: string;
+  sourceNote?: string;
+  /** 練習紀錄比較表的欄位（對應 AttemptRecord.highlights） */
+  historyColumns?: { key: string; label: string }[];
+  /** 技能專屬的狀態摘要卡 */
+  statusCards?: { title: string; rows: { label: string; value: string; tone?: 'good' | 'warn' | 'neutral' }[] }[];
+  /** 實際操作先後順序（依各階段第一次操作時間） */
+  sequence?: { stepId: string; title: string; t: number }[];
+  /** 各階段標題（回放時標示事件所屬階段） */
+  stepTitles?: Record<string, string>;
 }
 
 /** 本機練習紀錄（不含個資） */

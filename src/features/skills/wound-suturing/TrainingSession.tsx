@@ -7,6 +7,7 @@ import { useHintSystem } from '../../training/hintSystem';
 import { useInteractionEngine } from '../../training/interactionEngine';
 import { formatClock } from '../../training/modes';
 import { saveAttempt } from '../../training/storage';
+import { useIsMobile } from '../../training/useIsMobile';
 import { logPractice } from '../../../lib/practiceLog';
 import type { FeedbackReport, TrainingEvent, TrainingModeConfig } from '../../training/types';
 import { WOUND_SUTURING_CASE, getStep, type StepId } from './caseData';
@@ -22,17 +23,7 @@ import { SutureStage } from './stages/SutureStage';
 import { NarrationPanel } from './ui/NarrationPanel';
 import type { StageProps } from './ui/shared';
 
-export function useIsMobile() {
-  const q = '(max-width: 767px)';
-  const [m, setM] = useState(() => window.matchMedia(q).matches);
-  useEffect(() => {
-    const mq = window.matchMedia(q);
-    const on = () => setM(mq.matches);
-    mq.addEventListener('change', on);
-    return () => mq.removeEventListener('change', on);
-  }, []);
-  return m;
-}
+export { useIsMobile };
 
 const GLOVE_CODES = new Set(['gloves-contaminated', 'glove-donning-breach', 'suture-nonsterile']);
 

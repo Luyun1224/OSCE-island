@@ -149,7 +149,7 @@ export const ISLANDS: IslandConfig[] = [
     learningRoute: '/island/procedural-skills',
     modules: [
       { id: 'wound-suturing', title: '傷口縫合', type: 'skill', status: 'available' },
-      { id: 'urinary-catheterization', title: '導尿管置入', type: 'skill', status: 'planned' },
+      { id: 'urinary-catheterization', title: '導尿管置入', type: 'skill', status: 'available' },
       { id: 'iv-cannulation', title: '靜脈留置針置入', type: 'skill', status: 'planned' },
     ],
   },

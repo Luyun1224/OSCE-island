@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { formatClock } from '../modes';
 import type { AttemptRecord, FeedbackReport, StepStatus, TrainingModeId } from '../types';
+import { PracticeReplay } from './PracticeReplay';
 
 const MODE_LABEL: Record<TrainingModeId, string> = { guided: '教學引導', independent: '自主練習', challenge: 'OSCE 模擬挑戰' };
 const STATUS_STYLE: Record<StepStatus, { label: string; cls: string }> = {
@@ -30,13 +31,18 @@ export function FeedbackReportView({
   const strengths = report.suggestions.filter((s) => s.tone === 'strength');
   const stepTitle = (id: string) => report.stepReview.find((s) => s.stepId === id)?.title ?? id;
   const prev = history.slice(1, 6);
+  const columns = report.historyColumns ?? [
+    { key: 'stitches', label: '針數' },
+    { key: 'contaminations', label: '污染事件' },
+  ];
+  const stepTitles = report.stepTitles ?? Object.fromEntries(report.stepReview.map((s) => [s.stepId, s.title]));
 
   return (
     <div className="h-full overflow-y-auto bg-gradient-to-b from-sky-100 via-slate-50 to-blue-50">
       <div className="mx-auto max-w-5xl space-y-4 px-4 pb-16 pt-[max(1rem,env(safe-area-inset-top))] md:px-8">
         <header className="mt-2 rounded-3xl bg-gradient-to-br from-blue-800 to-slate-900 p-5 text-white shadow-glass md:p-6">
           <p className="text-[11px] font-bold tracking-[0.2em] text-sky-300">模擬練習評量・形成性回饋</p>
-          <h1 className="mt-1 text-2xl font-black">傷口縫合｜{MODE_LABEL[report.mode]}</h1>
+          <h1 className="mt-1 text-2xl font-black">{report.skillTitle ?? '傷口縫合'}｜{MODE_LABEL[report.mode]}</h1>
           {report.endReason === 'timeout' && <p className="mt-2 inline-block rounded-lg bg-rose-500/30 px-2 py-1 text-[12px] font-bold">考站時間到，本次模擬已結束</p>}
           {report.focusStepId && <p className="mt-2 inline-block rounded-lg bg-white/15 px-2 py-1 text-[12px] font-bold">單項練習：{stepTitle(report.focusStepId)}（其他階段已預先完成，分數僅供參考）</p>}
           <div className="mt-4 flex flex-wrap items-end gap-6">
@@ -52,7 +58,7 @@ export function FeedbackReportView({
               <p className="text-base font-bold">尚未評核・由教師評估</p>
             </div>
           </div>
-          <p className="mt-3 text-[11px] leading-relaxed text-sky-100/80">本分數依《傷口縫合.pdf》評分說明對應數位互動事件計算，僅供自我學習，不等同現場 OSCE 實作成績。</p>
+          <p className="mt-3 text-[11px] leading-relaxed text-sky-100/80">{report.sourceNote ?? '本分數依《傷口縫合.pdf》評分說明對應數位互動事件計算，僅供自我學習，不等同現場 OSCE 實作成績。'}</p>
         </header>
 
         <section className="grid grid-cols-2 gap-2 md:grid-cols-4">
@@ -63,6 +69,42 @@ export function FeedbackReportView({
             </div>
           ))}
         </section>
+
+        {report.statusCards && (
+          <section className="grid gap-2 md:grid-cols-3">
+            {report.statusCards.map((c) => (
+              <div key={c.title} className="rounded-2xl bg-white/90 p-3 shadow-sm">
+                <p className="text-[12px] font-black text-slate-700">{c.title}</p>
+                <ul className="mt-1 space-y-0.5 text-[12px]">
+                  {c.rows.map((r) => (
+                    <li key={r.label} className="flex justify-between gap-2">
+                      <span className="text-slate-500">{r.label}</span>
+                      <span className={`text-right font-bold ${r.tone === 'good' ? 'text-emerald-700' : r.tone === 'warn' ? 'text-amber-700' : 'text-slate-700'}`}>{r.value}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {report.sequence && report.sequence.length > 0 && (
+          <section className="rounded-3xl bg-white/90 p-4 shadow-sm md:p-5">
+            <h2 className="text-sm font-black text-slate-800">操作先後順序</h2>
+            <p className="text-[11px] text-slate-500">依各階段第一次操作的時間排列</p>
+            <ol className="mt-2 flex flex-wrap items-center gap-1 text-[12px]">
+              {report.sequence.map((q, i) => (
+                <li key={q.stepId} className="flex items-center gap-1">
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 font-bold text-slate-700">
+                    <span className="mr-1 font-mono text-[10px] text-slate-400">{formatClock(q.t)}</span>
+                    {q.title}
+                  </span>
+                  {i < report.sequence!.length - 1 && <span className="text-slate-300">→</span>}
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
 
         {/* 流程回顧 */}
         <section className="rounded-3xl bg-white/90 p-4 shadow-sm md:p-5">
@@ -126,8 +168,8 @@ export function FeedbackReportView({
 
         {/* 10 項規準對照 */}
         <section className="rounded-3xl bg-white/90 p-4 shadow-sm md:p-5">
-          <h2 className="text-sm font-black text-slate-800">教案 10 項評分規準對照</h2>
-          <p className="text-[11px] text-slate-500">0 沒有做到・1 部分做到・2 完全做到（規準文字取自考官指引）</p>
+          <h2 className="text-sm font-black text-slate-800">教案 {a.items.length} 項評分規準對照</h2>
+          <p className="text-[11px] text-slate-500">0 沒有做到・1 部分做到・2 完全做到（規準文字取自考官指引；教案只有 0／2 的項目不給 1 分）</p>
           <div className="mt-3 space-y-2">
             {a.items.map((it) => (
               <details key={it.id} className="group rounded-2xl bg-slate-50 ring-1 ring-slate-200">
@@ -144,7 +186,7 @@ export function FeedbackReportView({
                 </summary>
                 <div className="space-y-2 border-t border-slate-200 p-3 text-[12px]">
                   <div className="grid gap-1">
-                    {([2, 1, 0] as const).map((lv) => (
+                    {([2, 1, 0] as const).filter((lv) => it.criteria[lv] !== undefined).map((lv) => (
                       <p key={lv} className={`rounded-lg px-2 py-1 ${it.score === lv ? 'bg-blue-50 font-bold text-blue-800' : 'text-slate-500'}`}>
                         {lv} {SCORE_LABEL[lv]}：{it.criteria[lv]}
                       </p>
@@ -176,8 +218,11 @@ export function FeedbackReportView({
                     <th className="py-1 font-medium">時間</th>
                     <th className="font-medium">模式</th>
                     <th className="font-medium">模擬評量</th>
-                    <th className="font-medium">針數</th>
-                    <th className="font-medium">污染事件</th>
+                    {columns.map((c) => (
+                      <th key={c.key} className="font-medium">
+                        {c.label}
+                      </th>
+                    ))}
                     <th className="font-medium">用時</th>
                   </tr>
                 </thead>
@@ -192,8 +237,9 @@ export function FeedbackReportView({
                       <td>
                         {h.total}/{h.max}
                       </td>
-                      <td>{h.highlights.stitches}</td>
-                      <td>{h.highlights.contaminations}</td>
+                      {columns.map((c) => (
+                        <td key={c.key}>{h.highlights[c.key] ?? '—'}</td>
+                      ))}
                       <td>{formatClock(h.durationSec)}</td>
                     </tr>
                   ))}
@@ -202,6 +248,8 @@ export function FeedbackReportView({
             </div>
           )}
         </section>
+
+        <PracticeReplay events={report.events} stepTitles={stepTitles} onRetryStep={onRetryStep} />
 
         <section className="rounded-3xl bg-white/90 p-4 shadow-sm md:p-5">
           <button type="button" onClick={() => setShowEvents((v) => !v)} className="text-sm font-black text-slate-800">

@@ -1,6 +1,6 @@
 # OSCE Learning Islands｜醫學生 OSCE 學習探索島
 
-3D 群島學習平台。目前已開放：**病史詢問島 → HISTORY QUEST 病史偵探學院**、**技能操作島 → 技能訓練中心 → 傷口縫合互動關卡**。
+3D 群島學習平台。目前已開放：**病史詢問島 → HISTORY QUEST 病史偵探學院**、**技能操作島 → 技能訓練中心 → 傷口縫合、導尿管置入（CATHETER QUEST）互動關卡**。
 
 🌐 線上版：https://luyun1224.github.io/osce-island/
 
@@ -42,11 +42,22 @@ npm run preview    # 預覽正式版
 - **評量**：10 項規準 0／1／2 分逐字依考官指引；數位評分標示「模擬練習評量」，整體表現 1–5 分保留「尚未評核（由教師評估）」，無法由網頁觀察的部分標示「需實體操作評核」。
 - **回饋**：流程回顧、個別化補強建議（可一鍵重練弱項）、10 項規準對照、前後練習比較（僅存於本機瀏覽器）。
 
+## 技能操作島：導尿管置入關卡（CATHETER QUEST）
+
+路徑：技能訓練中心 → 導尿管置入（`#/skill/urinary-catheterization`）。依《技術操作－導尿管置放.pdf》建置；完整設計說明見 [`docs/catheter-quest-plan.md`](docs/catheter-quest-plan.md)。
+
+- **12 個可自由切換的階段**：說明與安撫 → 操作前手部衛生 → 器材準備 → 無菌手套 → 消毒 → 鋪洞巾 → 潤滑 → 置入 → 水球與定位 → 尿袋連接與固定 → 廢棄物 → 操作後手部衛生
+- **無菌狀態機與污染追蹤**：手套、導尿包、導尿管、尿袋接頭分別追蹤；可自行辨識並選擇補救方式
+- **置入模擬**：拖曳／按住／鍵盤推進，過快與偏離方向提醒、模擬阻力事件（停止並求助）、見尿與到達末端；所有進度皆為教學模擬狀態
+- **安全閘門**：受污染時不可置入；未見尿或未置入至末端時無法打水球
+- **評量**：14 項規準逐字依考官指引（第 7、11、12 項只有 0／2 分），整體表現 1–5 分由教師評估；回饋含狀態摘要、操作順序與**操作歷程回放**
+- 低多邊形 3D 急診診間可點選物件切換階段；手機版改以 2D 操作為主
+
 ### 新增技能關卡
 
 1. 在 `src/features/skills/registry/skillRegistry.ts` 新增一筆技能並提供 `load()`
 2. 在 `src/features/skills/<skill-id>/` 建立：`caseData.ts`（SkillCase）、`engine.ts`（互動規則 reducer）、`rubric.ts`（AssessmentRubric）、`report.ts`（FeedbackReport）與各階段 UI
-3. 共用框架在 `src/features/training/`：`interactionEngine`（事件紀錄／計時／暫停）、`hintSystem`、`assessment`、`modes`、`storage` 與 `components/`（拖曳、提示面板、操作紀錄、回饋報告）
+3. 共用框架在 `src/features/training/`：`interactionEngine`（事件紀錄／計時／暫停）、`hintSystem`、`assessment`、`modes`、`storage`、`sterile`（無菌狀態機、手套決策點、手部衛生部位）與 `components/`（拖曳、提示面板、操作紀錄、回饋報告、操作回放、手部衛生、病人溝通、無菌狀態卡）
 
 ## 部署（GitHub Pages）
 
