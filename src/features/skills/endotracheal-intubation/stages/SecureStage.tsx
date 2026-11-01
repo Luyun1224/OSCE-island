@@ -16,7 +16,7 @@ export function SecureStage({ state, dispatch, demo }: StageProps) {
       {!placed && <p className="rounded-2xl bg-amber-50 p-3 text-[13px] text-amber-900">目前沒有氣管內管。</p>}
       <div className="grid gap-3 md:grid-cols-[1fr_15rem]">
         <DropArea id="aw-mouth" title="病人口部與氣管內管" sub="把咬口器、固定帶拖到這裡" className="bg-white/70">
-          <div className="mx-auto aspect-[12/11] w-full max-w-xs">
+          <div className="mx-auto aspect-[58/43] w-full max-w-lg">
             <TubePositionView attempt={a} reveal={a.confirmed} />
           </div>
           <div className="flex justify-center gap-2 pb-1">

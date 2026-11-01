@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { AuscPoint } from '../caseData';
 import { AUSC_LABEL } from '../caseData';
 import { chestFinding, tooDeep, type Attempt, type AWState } from '../engine';
+import { SagittalAirway } from './SagittalAirway';
 
 /**
  * 教學示意圖（2D）：不是真實解剖影像，只呈現操作概念與案例規則的結果。
@@ -62,31 +63,22 @@ export function FaceTopView({ state, highlight }: { state: AWState; highlight?: 
   );
 }
 
-/** 頭頸側面示意：布捲位置與頭部後仰程度 */
+/** 頭頸側面示意：布捲位置與頭部後仰程度，疊上口軸／咽軸／喉軸 */
 export function HeadSideView({ state }: { state: AWState }) {
   const h = state.head;
-  const tilt = h.extension === 'neutral' ? 0 : h.extension === 'moderate' ? -14 : -32;
-  const lift = h.towel === 'occiput' ? -10 : 0;
-  const shoulder = h.towel === 'shoulder' ? -12 : 0;
+  const pose = h.towel === 'occiput' && h.extension === 'moderate' ? 'sniff' : h.extension === 'hyper' ? 'hyper' : 'neutral';
   return (
-    <svg viewBox="0 0 260 160" className="h-full w-full">
-      <rect width="260" height="160" rx="16" fill="#f1f5f9" />
-      <Note />
-      <rect x="0" y="122" width="260" height="38" fill="#cbd5e1" />
-      {h.towel === 'shoulder' && <rect x="118" y="104" width="50" height="18" rx="9" fill="#6ee7b7" stroke="#047857" />}
-      <path d={`M120 ${116 + shoulder} L250 ${116 + shoulder} L250 ${92 + shoulder} L130 ${92 + shoulder} Z`} fill="#bfdbfe" stroke="#60a5fa" />
-      {h.towel === 'occiput' && <rect x="44" y="104" width="46" height="18" rx="9" fill="#6ee7b7" stroke="#047857" />}
-      <g transform={`translate(${96} ${100 + lift}) rotate(${tilt} 30 0)`}>
-        <path d="M30 4 L30 -14 L-4 -18 L-4 4 Z" fill={skin} />
-        <ellipse cx="-16" cy="-18" rx="40" ry="30" fill={skin} stroke="#c99a76" strokeWidth="1.5" />
-        <path d="M-50 -30 Q-58 -20 -54 -8" fill="none" stroke="#c99a76" strokeWidth="3" />
-        <circle cx="-38" cy="-30" r="3" fill="#1f2937" />
-        <path d="M-56 -14 L-50 -12" stroke="#9f1239" strokeWidth="3" />
-      </g>
-      <text x="252" y="150" textAnchor="end" fontSize="9" fill="#475569">
+    <div className="relative h-full w-full">
+      <SagittalAirway pose={pose} axes labels={false} />
+      <div className="pointer-events-none absolute right-2 top-2 rounded-xl bg-white/90 px-2 py-1 text-[10px] font-bold leading-relaxed shadow">
+        <p className="text-blue-600">— 口軸</p>
+        <p className="text-green-600">— 咽軸</p>
+        <p className="text-red-600">— 喉軸</p>
+      </div>
+      <p className="pointer-events-none absolute bottom-2 left-2 rounded-lg bg-white/90 px-2 py-0.5 text-[10px] font-bold text-slate-600">
         布捲：{h.towel === 'occiput' ? '枕部' : h.towel === 'shoulder' ? '肩下' : '未放'}・頭部：{{ neutral: '平躺', moderate: '適度後仰', hyper: '過度後仰' }[h.extension]}
-      </text>
-    </svg>
+      </p>
+    </div>
   );
 }
 
@@ -116,18 +108,41 @@ export function LaryngoscopeView({ state, showTube, targets }: { state: AWState;
         )}
         {v === 'glottis' && (
           <>
-            <ellipse cx="110" cy="190" rx="100" ry="40" fill="#db7f7f" />
-            <path d="M74 52 Q110 30 146 52" fill="#f8b4b4" stroke="#e57373" strokeWidth="3" />
-            <path d="M110 70 L82 150 Q110 160 138 150 Z" fill="#1f0a0a" />
-            <path d="M110 70 L84 150 M110 70 L136 150" stroke="#f8fafc" strokeWidth="5" strokeLinecap="round" />
-            <ellipse cx="110" cy="176" rx="24" ry="8" fill="#3f0d0d" />
-            <text x="110" y="64" textAnchor="middle" fontSize="9" fill="#fecaca">
+            <defs>
+              <radialGradient id="aw-light" cx="0.5" cy="0.45" r="0.6">
+                <stop offset="0" stopColor="#f6a6a0" />
+                <stop offset="0.7" stopColor="#c45a5a" />
+                <stop offset="1" stopColor="#5b1414" />
+              </radialGradient>
+            </defs>
+            <circle cx="110" cy="112" r="96" fill="url(#aw-light)" />
+            {/* 葉片（上方）與會厭 */}
+            <path d="M40 22 Q110 4 180 22 L176 34 Q110 20 44 34 Z" fill="#cbd5e1" stroke="#64748b" />
+            <path d="M70 46 Q110 26 150 46 Q140 58 110 56 Q80 58 70 46 Z" fill="#f2a7a1" stroke="#c45a5a" strokeWidth="1.5" />
+            {/* 喉腔：可見氣管軟骨環 */}
+            <path d="M110 66 L80 146 Q110 158 140 146 Z" fill="#3a0d0d" />
+            {[0, 1, 2, 3].map((i) => (
+              <path key={i} d={`M${96 - i * 3} ${96 + i * 13} Q110 ${100 + i * 13} ${124 + i * 3} ${96 + i * 13}`} stroke="#7f3b3b" strokeWidth="2" fill="none" />
+            ))}
+            {/* 真聲帶（白色）與假聲帶 */}
+            <path d="M110 64 L82 146" stroke="#fdfdfd" strokeWidth="6" strokeLinecap="round" />
+            <path d="M110 64 L138 146" stroke="#fdfdfd" strokeWidth="6" strokeLinecap="round" />
+            <path d="M104 66 L70 146 M116 66 L150 146" stroke="#e98b8b" strokeWidth="5" strokeLinecap="round" />
+            {/* 杓狀軟骨 */}
+            <ellipse cx="88" cy="156" rx="13" ry="9" fill="#f2a7a1" stroke="#c45a5a" />
+            <ellipse cx="132" cy="156" rx="13" ry="9" fill="#f2a7a1" stroke="#c45a5a" />
+            {/* 食道開口（後方） */}
+            <ellipse cx="110" cy="182" rx="26" ry="7" fill="#2a0909" />
+            <text x="110" y="40" textAnchor="middle" fontSize="9" fill="#7f1d1d" fontWeight="700">
               會厭
             </text>
-            <text x="164" y="116" fontSize="9" fill="#fecaca">
+            <text x="168" y="108" fontSize="9" fill="#fff" fontWeight="700">
               聲帶
             </text>
-            <text x="110" y="198" textAnchor="middle" fontSize="9" fill="#fecaca">
+            <text x="110" y="122" textAnchor="middle" fontSize="8" fill="#fecaca">
+              氣管
+            </text>
+            <text x="110" y="202" textAnchor="middle" fontSize="9" fill="#fecaca">
               食道開口（後方）
             </text>
             {targets && <ellipse cx="110" cy="118" rx="20" ry="30" fill="none" stroke="#22c55e" strokeWidth="2" strokeDasharray="5 4" className="animate-pulse" />}
@@ -148,47 +163,44 @@ export function LaryngoscopeView({ state, showTube, targets }: { state: AWState;
 /** 氣管內管位置示意（矢狀面）：reveal=false 時只顯示「位置待確認」 */
 export function TubePositionView({ attempt, reveal }: { attempt: Attempt; reveal: boolean }) {
   const loc = attempt.location;
-  const deep = tooDeep(attempt);
+  const variant = loc === 'none' ? 'none' : !reveal ? 'none' : loc === 'esophagus' ? 'esophagus' : tooDeep(attempt) ? 'deep' : 'trachea';
   return (
-    <svg viewBox="0 0 240 220" className="h-full w-full">
-      <rect width="240" height="220" rx="16" fill="#f8fafc" />
-      <Note />
-      <path d="M30 40 Q60 30 90 40 L96 70" fill="none" stroke="#c99a76" strokeWidth="3" />
-      <text x="34" y="34" fontSize="9" fill="#64748b">
-        口
-      </text>
-      {/* 氣管（前）與食道（後） */}
-      <path d="M100 80 L110 190 M124 80 L134 190" stroke="#60a5fa" strokeWidth="3" fill="none" />
-      <path d="M134 80 L144 200 M156 80 L166 200" stroke="#f59e0b" strokeWidth="3" fill="none" />
-      <path d="M110 190 L92 212 M134 190 L150 212" stroke="#60a5fa" strokeWidth="3" fill="none" />
-      <text x="70" y="140" fontSize="9" fill="#2563eb">
-        氣管
-      </text>
-      <text x="170" y="140" fontSize="9" fill="#b45309">
-        食道
-      </text>
-      <text x="80" y="214" fontSize="8" fill="#2563eb">
-        右支氣管
-      </text>
-      {reveal && loc !== 'none' && (
-        <path
-          d={loc === 'esophagus' ? 'M40 44 Q90 40 140 90 L150 180' : deep ? 'M40 44 Q86 40 112 90 L120 186 L104 206' : 'M40 44 Q86 40 112 90 L118 168'}
-          fill="none"
-          stroke="#0f172a"
-          strokeWidth="6"
-          strokeLinecap="round"
-          opacity="0.75"
-        />
-      )}
-      <text x="120" y="66" textAnchor="middle" fontSize="11" fontWeight="800" fill={!reveal ? '#475569' : loc === 'trachea' && !deep ? '#047857' : loc === 'none' ? '#64748b' : '#b91c1c'}>
-        {loc === 'none' ? '尚未插管' : !reveal ? '位置待確認（完成確認後顯示）' : loc === 'esophagus' ? '食道插管（模擬）' : deep ? '過深：右側主支氣管（模擬）' : '氣管內（模擬）'}
-      </text>
-      {loc !== 'none' && attempt.depth !== null && (
-        <text x="234" y="30" textAnchor="end" fontSize="9" fill="#475569">
-          嘴角刻度 {attempt.depth} cm
-        </text>
-      )}
-    </svg>
+    <div className="relative h-full w-full">
+      <SagittalAirway tube={variant} cuffInflated={attempt.cuffInflated} />
+      <p className={`pointer-events-none absolute left-1/2 top-1 -translate-x-1/2 whitespace-nowrap rounded-full px-3 py-0.5 text-[12px] font-black shadow ${variant === 'trachea' ? 'bg-emerald-100 text-emerald-800' : variant === 'none' ? 'bg-white text-slate-600' : 'bg-rose-100 text-rose-800'}`}>
+        {loc === 'none' ? '尚未插管' : !reveal ? '管路位置待確認（完成確認後顯示）' : variant === 'esophagus' ? '食道插管（模擬）' : variant === 'deep' ? '過深：右主支氣管（模擬）' : '氣管內（模擬）'}
+        {loc !== 'none' && attempt.depth !== null ? `・嘴角 ${attempt.depth} cm` : ''}
+      </p>
+    </div>
+  );
+}
+
+/** 三種管路位置比較（依案例規則的結果） */
+export const COMPARE = [
+  { variant: 'trachea' as const, title: '✅ 正確：氣管內', tone: 'emerald', rows: ['胸廓：兩側對稱起伏', '聽診：兩側呼吸音對稱、胃部無聲', '（補充）ETCO₂：持續方形波形', '嘴角刻度：約 20–22 cm（本教案）'] },
+  { variant: 'esophagus' as const, title: '❌ 食道插管', tone: 'rose', rows: ['胸廓：無起伏，上腹鼓起', '聽診：胃部氣過水聲、肺部幾乎無呼吸音', '（補充）ETCO₂：沒有持續波形', '處置：立即拔管、重新給氧、再插管'] },
+  { variant: 'deep' as const, title: '⚠️ 過深：單側（右）', tone: 'amber', rows: ['胸廓：右側為主，左側起伏少', '聽診：左側呼吸音減弱', '嘴角刻度：超過教案範圍', '處置：cuff 放氣、退管調整深度、再確認'] },
+];
+
+export function AirwayComparison({ compact }: { compact?: boolean }) {
+  return (
+    <div className={`grid gap-2 ${compact ? 'grid-cols-3' : 'md:grid-cols-3'}`}>
+      {COMPARE.map((c) => (
+        <div key={c.variant} className={`overflow-hidden rounded-2xl bg-white ring-2 ${c.tone === 'emerald' ? 'ring-emerald-300' : c.tone === 'rose' ? 'ring-rose-300' : 'ring-amber-300'}`}>
+          <p className={`px-3 py-1.5 text-[12px] font-black ${c.tone === 'emerald' ? 'bg-emerald-50 text-emerald-800' : c.tone === 'rose' ? 'bg-rose-50 text-rose-800' : 'bg-amber-50 text-amber-900'}`}>{c.title}</p>
+          <div className="aspect-[58/43]">
+            <SagittalAirway tube={c.variant} labels={false} />
+          </div>
+          {!compact && (
+            <ul className="space-y-0.5 px-3 pb-2 text-[11px] leading-relaxed text-slate-600">
+              {c.rows.map((r) => (
+                <li key={r}>• {r}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      ))}
+    </div>
   );
 }
 

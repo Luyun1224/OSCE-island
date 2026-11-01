@@ -79,7 +79,7 @@ export function IntubateStage({ state, dispatch, mode, demo }: StageProps) {
           )}
         </div>
       </div>
-      <div className="mx-auto aspect-[12/11] w-full max-w-xs">
+      <div className="mx-auto aspect-[58/43] w-full max-w-xl">
         <TubePositionView attempt={a} reveal={reveal} />
       </div>
       <ReviewNote>{CFG.review.technique.note} 置管結果由「你放的位置」與案例規則決定，拖曳本身不代表真實插管技巧。</ReviewNote>

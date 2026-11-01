@@ -1,11 +1,11 @@
 import { lazy, Suspense } from 'react';
 import type { AWState } from '../engine';
 import type { Scene3DPreset } from '../scene/AirwayScene';
-import { AuscultationMap, ChestView, LaryngoscopeView, TubePositionView } from './views';
+import { AirwayComparison, AuscultationMap, ChestView, LaryngoscopeView, TubePositionView } from './views';
 
 const AirwayScene = lazy(() => import('../scene/AirwayScene'));
 
-export type CameraPreset = Scene3DPreset | 'laryngoscope' | 'tube' | 'auscultation';
+export type CameraPreset = Scene3DPreset | 'laryngoscope' | 'tube' | 'auscultation' | 'compare';
 
 export const CAMERA_LABEL: Record<CameraPreset, string> = {
   panorama: '全景視角',
@@ -14,6 +14,7 @@ export const CAMERA_LABEL: Record<CameraPreset, string> = {
   tube: '氣管內管位置示意',
   chest: '胸廓觀察視角',
   auscultation: '聽診位置示意',
+  compare: '位置比較圖',
 };
 
 /**
@@ -35,16 +36,17 @@ export function AirwayCameraController({ state, preset, onPreset, highlight, rev
           ))}
         </div>
       )}
-      <div className="relative h-56 lg:h-64">
+      <div className="relative h-64 lg:h-80">
         {is3D ? (
           <Suspense fallback={<div className="h-full animate-pulse bg-indigo-50" />}>
             <AirwayScene state={state} preset={preset} highlight={highlight} className="h-full" />
           </Suspense>
         ) : (
-          <div className="mx-auto h-full max-w-md p-2">
+          <div className={`mx-auto h-full p-2 ${preset === 'compare' ? 'max-w-4xl overflow-y-auto' : preset === 'tube' ? 'max-w-xl' : 'max-w-md'}`}>
             {preset === 'laryngoscope' && <LaryngoscopeView state={state} showTube />}
             {preset === 'tube' && <TubePositionView attempt={a} reveal={revealTube} />}
             {preset === 'auscultation' && <AuscultationMap checked={a.ausc} wrong={a.wrongAusc} labels />}
+            {preset === 'compare' && <AirwayComparison compact />}
           </div>
         )}
         {preset === 'chest' && (

@@ -3,6 +3,8 @@ import { AIRWAY_CASE, EQUIPMENT } from '../caseData';
 import { createInitialState } from '../engine';
 import { AIRWAY_RUBRIC } from '../rubric';
 import { AWIcon } from './Icons';
+import { SagittalAirway } from './SagittalAirway';
+import { AirwayComparison } from './views';
 
 const Scene = lazy(() => import('../scene/AirwayScene'));
 const sc = AIRWAY_CASE.scenario;
@@ -56,10 +58,10 @@ export function ScenarioIntro({ onContinue, onBack }: { onContinue: () => void; 
           </section>
           <section className="space-y-4">
             <div className="overflow-hidden rounded-3xl bg-white/90 shadow-glass">
-              <Suspense fallback={<div className="h-56 animate-pulse bg-indigo-100" />}>
-                <Scene state={PREVIEW} preset="panorama" className="h-56" />
+              <Suspense fallback={<div className="h-64 animate-pulse bg-indigo-100" />}>
+                <Scene state={PREVIEW} preset="panorama" className="h-64" />
               </Suspense>
-              <p className="px-4 py-2 text-[11px] text-slate-500">🏥 急診呼吸道處置模擬室（教學示意模型，可拖曳旋轉）</p>
+              <p className="px-4 py-2 text-[11px] text-slate-500">🏥 急診呼吸道處置模擬室：氣道管理訓練模型（雙肺與胃袋外露，可拖曳旋轉）</p>
             </div>
             <div className="rounded-3xl bg-white/90 p-5 shadow-glass">
               <h2 className="text-[11px] font-bold tracking-widest text-slate-400">道具與耗材（教案第 6 頁）</h2>
@@ -74,6 +76,25 @@ export function ScenarioIntro({ onContinue, onBack }: { onContinue: () => void; 
             </div>
           </section>
         </div>
+
+        <section className="mt-4 rounded-3xl bg-white/90 p-5 shadow-glass">
+          <h2 className="text-[11px] font-bold tracking-widest text-slate-400">插管示意圖（矢狀切面）</h2>
+          <div className="mt-2 grid gap-4 md:grid-cols-[1.2fr_1fr]">
+            <div className="aspect-[58/43] overflow-hidden rounded-2xl ring-1 ring-slate-200">
+              <SagittalAirway tube="trachea" />
+            </div>
+            <ul className="space-y-1.5 self-center text-[13px] leading-relaxed text-slate-700">
+              <li>• 氣管內管由口部進入，經過舌頭上方與會厭後方，通過聲帶進入<b>氣管（前側）</b>；食道在氣管的<b>後側</b>。</li>
+              <li>• 氣囊（cuff）位於聲帶下方的氣管內，充氣後密封呼吸道；由口外的<b>氣囊充氣處（pilot balloon）</b>打氣。</li>
+              <li>• 管路外端的 15 mm 接頭連接 Ambu bag 或呼吸器。</li>
+              <li className="text-[11px] text-slate-400">原創教學示意圖，非真實解剖影像。</li>
+            </ul>
+          </div>
+          <h2 className="mt-5 text-[11px] font-bold tracking-widest text-slate-400">三種管路位置比較</h2>
+          <div className="mt-2">
+            <AirwayComparison />
+          </div>
+        </section>
 
         <section className="mt-4 rounded-3xl bg-white/90 p-5 shadow-glass">
           <h2 className="text-[11px] font-bold tracking-widest text-slate-400">評分規準（14 項，每項最高 2 分）</h2>

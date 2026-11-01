@@ -21,10 +21,10 @@ export function PositionStage({ state, dispatch, demo, demoHighlight }: StagePro
   return (
     <div className="space-y-3">
       <div className="grid gap-3 md:grid-cols-[1fr_15rem]">
-        <div className="relative mx-auto aspect-[13/8] w-full max-w-lg">
+        <div className="relative mx-auto aspect-[58/43] w-full max-w-xl">
           <HeadSideView state={state} />
-          <Spot id="aw-occiput" label="枕部" className="left-[14%] top-[58%] h-[22%] w-[24%]" />
-          <Spot id="aw-shoulder" label="肩下" className="left-[44%] top-[58%] h-[22%] w-[24%]" />
+          <Spot id="aw-occiput" label="枕部" className="left-[14%] top-[80%] h-[18%] w-[30%]" />
+          <Spot id="aw-shoulder" label="肩下" className="left-[62%] top-[80%] h-[18%] w-[30%]" />
         </div>
         <div className="space-y-2">
           <div className="rounded-2xl bg-white/90 p-3 ring-1 ring-slate-200">

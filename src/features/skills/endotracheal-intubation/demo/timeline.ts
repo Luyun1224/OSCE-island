@@ -267,6 +267,23 @@ export const DEMO_TIMELINE: Ch[] = [
         source: 'case',
       }),
       S({
+        stepId: 'ch5-compare',
+        practiceStepId: 'confirm',
+        title: '位置比較：氣管、食道、過深',
+        duration: 3000,
+        cameraPreset: 'compare',
+        animationAction: [],
+        cues: [
+          { text: '比較三種管路位置。正確在氣管內時，兩側胸廓對稱起伏、兩側呼吸音對稱，胃部沒有聲音。' },
+          { text: '食道插管時，胸廓沒有起伏，胃部聽到氣過水聲，必須立即拔管並重新給氧。' },
+          { text: '插得太深時，管子容易進入右主支氣管，左側呼吸音減弱，要將 cuff 放氣後調整深度。' },
+        ],
+        highlightedObjects: [],
+        teachingPoints: ['多種確認方法合併判斷', '發現異常立即處理，不可直接固定'],
+        safetyNotes: ['食道插管若未辨識會延誤通氣'],
+        source: 'case',
+      }),
+      S({
         stepId: 'ch5-capno',
         practiceStepId: 'confirm',
         title: '波形二氧化碳監測',

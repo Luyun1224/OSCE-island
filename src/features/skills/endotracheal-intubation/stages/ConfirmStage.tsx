@@ -4,7 +4,7 @@ import { AUSC_LABEL, REQUIRED_AUSC, type AuscPoint } from '../caseData';
 import { auscFinding } from '../engine';
 import { AWIcon } from '../ui/Icons';
 import { DropArea, SupplementNote, type StageProps } from '../ui/shared';
-import { AuscultationMap, CapnoView, ChestView, TubePositionView } from '../ui/views';
+import { AirwayComparison, AuscultationMap, CapnoView, ChestView, TubePositionView } from '../ui/views';
 
 /** PlacementVerification：接 Ambu bag → 壓袋 → 胸廓 → 五點聽診 →（補充）波形 ETCO₂ → 判斷 */
 export function ConfirmStage({ state, dispatch, mode, demo }: StageProps) {
@@ -20,7 +20,12 @@ export function ConfirmStage({ state, dispatch, mode, demo }: StageProps) {
     return (
       <div className="space-y-3">
         <p className="rounded-2xl bg-amber-50 p-3 text-[13px] text-amber-900">目前沒有氣管內管。{state.needReox ? '請先以袋瓣罩重新給氧，再重新插管。' : ''}</p>
-        {state.final && <TubePositionView attempt={state.final} reveal />}
+        {state.final && (
+          <div className="mx-auto aspect-[58/43] w-full max-w-xl">
+            <TubePositionView attempt={state.final} reveal />
+          </div>
+        )}
+        <AirwayComparison />
       </div>
     );
 
@@ -66,6 +71,14 @@ export function ConfirmStage({ state, dispatch, mode, demo }: StageProps) {
           <TubePositionView attempt={a} reveal={reveal} />
         </div>
       </div>
+      {(mode.showHints || reveal) && (
+        <details className="rounded-3xl bg-white/90 p-3 ring-1 ring-slate-200" open={reveal}>
+          <summary className="cursor-pointer text-[12px] font-black text-slate-700">📖 三種管路位置的示意圖比較（依案例規則）</summary>
+          <div className="mt-2">
+            <AirwayComparison />
+          </div>
+        </details>
+      )}
 
       <div className="grid gap-3 md:grid-cols-[1fr_16rem]">
         <div className="rounded-3xl bg-white/90 p-3 ring-1 ring-slate-200">

@@ -45,9 +45,10 @@ src/features/skills/endotracheal-intubation/
 ├── rubric.ts                 14 項規準（rubricId、allowedScores、criteria、observableEvents、safetyCritical、sourcePage、reviewStatus）
 ├── engine.ts                 AirwayEquipmentTray／VentilationSimulation／LaryngoscopeInteraction／IntubationSimulation／TubePositionState／PlacementVerification／AirwaySafetyEvents
 ├── report.ts                 形成性回饋、安全警示、補充模組
-├── scene/AirwayScene.tsx     低多邊形急診插管模擬室（3D）
+├── scene/AirwayScene.tsx     急診插管模擬室（3D）：原創「氣道管理訓練模型」（白色底板、頭頸、上胸殼、外露雙肺與胃袋），通氣時依案例規則鼓起
 ├── ui/CameraController.tsx   AirwayCameraController：全景／呼吸道／喉頭鏡局部／管路位置示意／胸廓／聽診位置
-├── ui/views.tsx              2D 教學示意圖（標示「非真實解剖影像」）
+├── ui/SagittalAirway.tsx     頭頸矢狀切面插管示意圖（舌頭、會厭、聲帶、氣管軟骨環、食道、頸椎；氣管內管含接頭、pilot balloon、cuff；過深時附冠狀面小圖）
+├── ui/views.tsx              2D 教學示意圖與「三種位置比較圖」（標示「非真實解剖影像」）
 ├── stages/                   8 個互動階段
 └── demo/                     示範時間軸與播放
 ```
@@ -120,3 +121,10 @@ src/features/skills/endotracheal-intubation/
 3. OSCE 挑戰模式中固定食道插管 → 出現安全中止；報告列出安全警示，點「觀看正確示範」會跳到對應章節，再返回報告。
 4. 示範時間軸全部動作套用到引擎 → 28／28、無錯誤事件。
 5. 手機（390 px）：器材準備時工作車移到操作區上方。
+
+## 9. 模型與示意圖（第二版）
+
+- 3D 訓練模型改為參考一般氣道管理訓練模型的造型（原創，不含任何品牌標示）：頭部可依擺位後仰，面罩、喉頭鏡、氣管內管、固定帶會出現在口部。
+- 雙肺與胃袋依案例規則鼓起：有效通氣時雙肺鼓起；過深時以右肺為主；食道插管時胃袋鼓起。
+- 2D 示意圖改為詳細的矢狀切面插管圖，並新增「正確／食道／過深」三種位置比較圖。比較圖出現在三個地方：情境介紹、鏡頭的「位置比較圖」分頁、插管後確認（引導模式，或已做出判斷後）。示範第 5 章也加入了比較段落。
+- 頭部擺位畫面疊上口軸、咽軸、喉軸三條示意線。喉頭鏡視野加入會厭、真假聲帶、杓狀軟骨、氣管軟骨環與食道開口。
