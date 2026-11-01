@@ -26,9 +26,8 @@ export function AirwayCameraController({ state, preset, onPreset, highlight, rev
   const assets = useAirwayAssets();
   const ready = realistic3DReady(assets);
   const want3D = preset === 'panorama' || preset === 'airway' || preset === 'chest';
-  const is3D = want3D && ready;
-  // 高擬真資產未齊：3D 視角改以 2D 教學示意圖呈現（不以幾何體拼湊病人）
-  const shown: CameraPreset = want3D && !ready ? (preset === 'chest' ? 'chest' : 'tube') : preset;
+  const is3D = want3D;
+  const shown: CameraPreset = preset;
   const a = state.attempt;
   return (
     <div className={`overflow-hidden rounded-3xl bg-white/80 ring-1 ring-indigo-200 ${className ?? ''}`}>
@@ -36,7 +35,7 @@ export function AirwayCameraController({ state, preset, onPreset, highlight, rev
         <div className="flex gap-1 overflow-x-auto border-b border-indigo-100 bg-white/90 p-1.5">
           {(Object.keys(CAMERA_LABEL) as CameraPreset[]).map((p) => (
             <button key={p} type="button" onClick={() => onPreset(p)} className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${p === preset ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
-              {p === 'panorama' || p === 'airway' || p === 'chest' ? (ready ? '🎥 ' : '⏳ ') : '🖼️ '}
+              {p === 'panorama' || p === 'airway' || p === 'chest' ? '🎥 ' : '🖼️ '}
               {CAMERA_LABEL[p]}
             </button>
           ))}
@@ -53,11 +52,10 @@ export function AirwayCameraController({ state, preset, onPreset, highlight, rev
             {shown === 'tube' && <TubePositionView attempt={a} reveal={revealTube} />}
             {shown === 'auscultation' && <AuscultationMap checked={a.ausc} wrong={a.wrongAusc} labels />}
             {shown === 'compare' && <AirwayComparison compact />}
-            {shown === 'chest' && <ChestView attempt={a.location !== 'none' ? a : undefined} preRise={state.preRise > 0} animate={false} />}
           </div>
         )}
-        {want3D && !ready && (
-          <span className="pointer-events-none absolute right-2 top-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-900 ring-1 ring-amber-300">{assets.state === 'checking' ? '檢查 3D 資產中…' : '3D 高擬真資產待補・暫以 2D 示意'}</span>
+        {want3D && !ready && assets.state === 'ready' && (
+          <span className="pointer-events-none absolute right-2 top-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-900 ring-1 ring-amber-300">病人 3D 模型待補</span>
         )}
         {preset === 'chest' && is3D && (
           <div className="pointer-events-none absolute bottom-2 right-2 h-24 w-32 rounded-xl bg-white/90 p-1 shadow">

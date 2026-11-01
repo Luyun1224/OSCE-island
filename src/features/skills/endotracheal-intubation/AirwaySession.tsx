@@ -16,8 +16,8 @@ import { AirwayDemo } from './demo/AirwayDemo';
 import { CHAPTER_OF } from './demo/timeline';
 import { airwayReducer, createFocusState, createInitialState, type AWAction } from './engine';
 import { buildReport, toAttemptRecord } from './report';
-import { DEFAULT_CAMERA, StageView } from './stages';
-import { AirwayCameraController, type CameraPreset } from './ui/CameraController';
+import { StageView } from './stages';
+import { SimViewport } from './ui/SimViewport';
 import { CartPanel } from './ui/CartPanel';
 
 export function AirwaySession({ mode, focusStep, onFinish, onExit }: { mode: TrainingModeConfig; focusStep: StepId | null; onFinish: (r: FeedbackReport) => void; onExit: () => void }) {
@@ -39,11 +39,9 @@ export function AirwaySession({ mode, focusStep, onFinish, onExit }: { mode: Tra
   const [demoChapter, setDemoChapter] = useState<number | null>(null);
   const [confirm, setConfirm] = useState<null | 'exit' | 'restart' | 'finish'>(null);
   const [panelOpen, setPanelOpen] = useState(false);
-  const [camera, setCamera] = useState<CameraPreset>(DEFAULT_CAMERA[state.activeStep]);
-  const [cameraOpen, setCameraOpen] = useState(() => window.matchMedia('(min-width: 1024px)').matches);
+  const [cameraOpen, setCameraOpen] = useState(true);
   const toastId = useRef(0);
 
-  useEffect(() => setCamera(DEFAULT_CAMERA[state.activeStep]), [state.activeStep]);
 
   const toast = useCallback((tone: ToastTone, t: string, body?: string) => {
     const id = ++toastId.current;
@@ -124,8 +122,8 @@ export function AirwaySession({ mode, focusStep, onFinish, onExit }: { mode: Tra
           <button type="button" onClick={() => engine.setPaused(!paused)} className="rounded-full bg-slate-100 px-3 py-1.5 text-[12px] font-bold text-slate-600 hover:bg-slate-200">
             {paused ? '▶ 繼續' : '⏸ 暫停'}
           </button>
-          <button type="button" onClick={() => setCameraOpen((v) => !v)} className="hidden rounded-full bg-slate-100 px-3 py-1.5 text-[12px] font-bold text-slate-600 hover:bg-slate-200 sm:block">
-            {cameraOpen ? '收合鏡頭' : '🎥 鏡頭'}
+          <button type="button" onClick={() => setCameraOpen((v) => !v)} className="rounded-full bg-slate-100 px-3 py-1.5 text-[12px] font-bold text-slate-600 hover:bg-slate-200">
+            {cameraOpen ? '收合 3D 場景' : '🏥 3D 場景'}
           </button>
         </header>
 
@@ -174,7 +172,17 @@ export function AirwaySession({ mode, focusStep, onFinish, onExit }: { mode: Tra
 
           {/* 中：訓練模型與操作區 */}
           <main className="relative shrink-0 p-3 md:min-h-0 md:flex-1 md:shrink md:overflow-y-auto md:p-4">
-            {cameraOpen && <AirwayCameraController className="mb-3" state={state} preset={camera} onPreset={setCamera} revealTube={state.attempt.confirmed || !!state.final?.confirmed} />}
+            {cameraOpen && (
+              <SimViewport
+                className="mb-3 h-[46vh] min-h-[340px] md:h-[54vh] lg:h-[58vh]"
+                state={state}
+                showHints={mode.showHints}
+                stepTitle={`${step.order}. ${step.title}`}
+                onStep={setStep}
+                onVerbal={() => setVerbalOpen(true)}
+                onDemo={mode.showHints ? openDemo : undefined}
+              />
+            )}
             <div className="mb-2 flex items-baseline gap-2">
               <h2 className="text-lg font-black text-slate-800">
                 {step.order}. {step.title}

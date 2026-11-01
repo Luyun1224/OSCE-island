@@ -1,17 +1,21 @@
 # AIRWAY QUEST 高擬真 3D 資產放置處
 
-把符合規格的 GLB 檔放在這個資料夾，推送到 main 後，網站會自動偵測並啟用 3D 場景。
-資產沒有放齊之前，3D 視角會自動改用 2D 教學示意圖，並標示「3D 資產待補」。
+把符合規格的 GLB 檔放在這個資料夾，推送到 main 後，網站會自動偵測並放進 3D 病房。
+病人資產沒有放入之前，病床上只顯示明確標示的位置標記，HUD 會註明「病人 3D 模型待補」。
 病人與器械都不會以幾何體拼湊。
 
 完整說明見 `docs/airway-3d-realism-plan.md`。
 
-## 必要（缺一不啟用 3D）
+## 病人主體（二擇一；都沒有時，病床上只顯示位置標記）
+
+病房與病床已由程式建模（PBR）。病人主體只能使用以下其中一個資產：
 
 | 檔名 | 內容 | 必備節點／morph |
 | --- | --- | --- |
-| `airway-trainer.glb` | 成人氣道管理訓練模型：頭頸、上胸、可視雙肺與胃袋，含底板 | 節點 `Head`、`Mouth_Socket`、`Lung_L`、`Lung_R`、`Stomach`；morph `lung_inflate_L`、`lung_inflate_R`、`stomach_inflate` |
-| `skills-room.glb` | 臨床技能中心或 OSCE 考站場景：診察台、牆面、地板、櫃體、照明造型 | 診察台檯面中心放在原點；選用錨點 `Cart_Anchor`、`Monitor_Anchor` |
+| `patient-adult.glb` | 成人病人：真實比例頭頸、肩胸、軀幹、四肢、關節，穿病人服；原點為床墊面中心，頭朝 −Z | 節點 `Head`、`Mouth_Socket`、`Chest`；morph `breath`、`stomach_inflate` |
+| `airway-trainer.glb` | 成人氣道管理訓練模型：頭頸、上胸、可視雙肺與胃袋，含底板；原點為床墊面中心 | 節點 `Head`、`Mouth_Socket`、`Lung_L`、`Lung_R`、`Stomach`；morph `lung_inflate_L`、`lung_inflate_R`、`stomach_inflate` |
+
+選用：`hospital-bed.glb`（取代程式建模病床）。
 
 ## 選用（有就顯示，沒有就不顯示）
 

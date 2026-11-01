@@ -61,7 +61,7 @@ export function ScenarioIntro({ onContinue, onBack }: { onContinue: () => void; 
           </section>
           <section className="space-y-4">
             <div className="overflow-hidden rounded-3xl bg-white/90 shadow-glass">
-              {ready && assets.state === 'ready' ? (
+              {assets.state === 'ready' ? (
                 <Suspense fallback={<div className="h-64 animate-pulse bg-indigo-100" />}>
                   <Scene state={PREVIEW} preset="panorama" available={assets.available} className="h-64" />
                 </Suspense>
@@ -70,7 +70,7 @@ export function ScenarioIntro({ onContinue, onBack }: { onContinue: () => void; 
                   <SagittalAirway tube="trachea" labels={false} />
                 </div>
               )}
-              <p className="px-4 py-2 text-[11px] text-slate-500">{ready ? '🏥 臨床技能中心・氣道管理訓練模型（可拖曳旋轉）' : '⏳ 高擬真 3D 模型與場景資產待補，目前以 2D 教學示意圖進行；說明見 docs/airway-3d-realism-plan.md'}</p>
+              <p className="px-4 py-2 text-[11px] text-slate-500">{ready ? '🏥 急診模擬病房（可拖曳旋轉）' : '🏥 急診模擬病房（可拖曳旋轉）・病人 3D 模型待補，目前以位置標記代替；說明見 docs/airway-3d-realism-plan.md'}</p>
             </div>
             <div className="rounded-3xl bg-white/90 p-5 shadow-glass">
               <h2 className="text-[11px] font-bold tracking-widest text-slate-400">道具與耗材（教案第 6 頁）</h2>
