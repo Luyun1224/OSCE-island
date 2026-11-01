@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { AIRWAY_CASE, EQUIPMENT } from '../caseData';
 import { createInitialState } from '../engine';
 import { AIRWAY_RUBRIC } from '../rubric';
+import { realistic3DReady, useAirwayAssets } from '../scene/assets';
 import { AWIcon } from './Icons';
 import { SagittalAirway } from './SagittalAirway';
 import { AirwayComparison } from './views';
@@ -11,6 +12,8 @@ const sc = AIRWAY_CASE.scenario;
 const PREVIEW = createInitialState();
 
 export function ScenarioIntro({ onContinue, onBack }: { onContinue: () => void; onBack: () => void }) {
+  const assets = useAirwayAssets();
+  const ready = realistic3DReady(assets);
   return (
     <div className="h-full overflow-y-auto bg-gradient-to-b from-indigo-50 via-slate-50 to-sky-50">
       <div className="mx-auto max-w-5xl px-4 pb-16 pt-[max(1rem,env(safe-area-inset-top))] md:px-8">
@@ -58,10 +61,16 @@ export function ScenarioIntro({ onContinue, onBack }: { onContinue: () => void; 
           </section>
           <section className="space-y-4">
             <div className="overflow-hidden rounded-3xl bg-white/90 shadow-glass">
-              <Suspense fallback={<div className="h-64 animate-pulse bg-indigo-100" />}>
-                <Scene state={PREVIEW} preset="panorama" className="h-64" />
-              </Suspense>
-              <p className="px-4 py-2 text-[11px] text-slate-500">🏥 急診呼吸道處置模擬室：氣道管理訓練模型（雙肺與胃袋外露，可拖曳旋轉）</p>
+              {ready && assets.state === 'ready' ? (
+                <Suspense fallback={<div className="h-64 animate-pulse bg-indigo-100" />}>
+                  <Scene state={PREVIEW} preset="panorama" available={assets.available} className="h-64" />
+                </Suspense>
+              ) : (
+                <div className="aspect-[58/43]">
+                  <SagittalAirway tube="trachea" labels={false} />
+                </div>
+              )}
+              <p className="px-4 py-2 text-[11px] text-slate-500">{ready ? '🏥 臨床技能中心・氣道管理訓練模型（可拖曳旋轉）' : '⏳ 高擬真 3D 模型與場景資產待補，目前以 2D 教學示意圖進行；說明見 docs/airway-3d-realism-plan.md'}</p>
             </div>
             <div className="rounded-3xl bg-white/90 p-5 shadow-glass">
               <h2 className="text-[11px] font-bold tracking-widest text-slate-400">道具與耗材（教案第 6 頁）</h2>
