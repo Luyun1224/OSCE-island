@@ -15,6 +15,10 @@ export function runRubric<C>(items: RubricItemDef<C>[], ctx: C): AssessmentResul
       physicalNote: item.physicalNote,
       stepIds: item.stepIds,
       allowedScores,
+      safetyCritical: item.safetyCritical,
+      sourcePage: item.sourcePage,
+      reviewStatus: item.reviewStatus,
+      reviewNote: item.reviewNote,
       ...r,
       score,
     };

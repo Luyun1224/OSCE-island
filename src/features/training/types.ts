@@ -83,6 +83,8 @@ export interface TrainingEvent {
   message: string;
   /** 教學說明：引導模式即時顯示，其他模式只在報告中呈現 */
   why?: string;
+  /** 臨床安全相關事件（回放時以 🛑 標示） */
+  safety?: boolean;
 }
 
 export type NewEvent = Omit<TrainingEvent, 'id' | 't'>;
@@ -104,6 +106,13 @@ export interface RubricItemDef<C> {
   criteria: RubricCriteria;
   /** 教案允許的分數（預設 0 / 1 / 2） */
   allowedScores?: RubricScore[];
+  /** 以下為選填的規準中繼資料 */
+  observableEvents?: string[];
+  safetyCritical?: boolean;
+  sourcePage?: number;
+  reviewStatus?: 'draft' | 'pending-teacher' | 'reviewed';
+  /** 原始評分表與考官指引不一致等待確認事項 */
+  reviewNote?: string;
   observability: Observability;
   physicalNote?: string;
   stepIds: string[];
@@ -115,6 +124,10 @@ export interface RubricItemResult {
   title: string;
   criteria: RubricCriteria;
   allowedScores: RubricScore[];
+  safetyCritical?: boolean;
+  sourcePage?: number;
+  reviewStatus?: 'draft' | 'pending-teacher' | 'reviewed';
+  reviewNote?: string;
   score: RubricScore;
   evidence: string[];
   missing: string[];
@@ -176,6 +189,10 @@ export interface FeedbackReport {
   sequence?: { stepId: string; title: string; t: number }[];
   /** 各階段標題（回放時標示事件所屬階段） */
   stepTitles?: Record<string, string>;
+  /** 臨床安全相關警示（與規準分數分開呈現） */
+  safetyAlerts?: { title: string; detail: string; stepId: string }[];
+  /** 不屬於原教案評分的補充模組（例如現行臨床安全補充） */
+  supplements?: { title: string; tag: string; rows: { label: string; value: string; tone?: 'good' | 'warn' | 'neutral' }[]; note?: string }[];
 }
 
 /** 本機練習紀錄（不含個資） */

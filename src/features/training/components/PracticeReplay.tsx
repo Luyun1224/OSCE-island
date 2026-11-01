@@ -16,7 +16,7 @@ const LABEL: Record<string, string> = { contamination: '污染', error: '錯誤'
  * PracticeReplay：操作歷程回放
  * 依實際事件時間排列；可自動播放，點擊錯誤事件查看教學說明並直接重練該階段。
  */
-export function PracticeReplay({ events, stepTitles, onRetryStep }: { events: TrainingEvent[]; stepTitles: Record<string, string>; onRetryStep: (stepId: string) => void }) {
+export function PracticeReplay({ events, stepTitles, onRetryStep, onWatchDemo }: { events: TrainingEvent[]; stepTitles: Record<string, string>; onRetryStep: (stepId: string) => void; onWatchDemo?: (stepId: string) => void }) {
   const list = events.filter((e) => e.code !== 'pause' && e.code !== 'blocked' && e.kind !== 'hint');
   const [cursor, setCursor] = useState(-1);
   const [playing, setPlaying] = useState(false);
@@ -82,6 +82,7 @@ export function PracticeReplay({ events, stepTitles, onRetryStep }: { events: Tr
                 >
                   <span className="mr-2 font-mono tabular-nums text-slate-400">{formatClock(e.t)}</span>
                   <span className="mr-1.5 rounded bg-white/70 px-1 text-[10px] font-bold">{LABEL[e.kind] ?? e.kind}</span>
+                  {e.safety && <span className="mr-1.5 rounded bg-rose-600 px-1 text-[10px] font-bold text-white">🛑 安全</span>}
                   {stepTitles[e.stepId] && <span className="mr-1.5 text-[10px] font-bold text-slate-400">{stepTitles[e.stepId]}</span>}
                   {e.message}
                 </button>
@@ -89,9 +90,16 @@ export function PracticeReplay({ events, stepTitles, onRetryStep }: { events: Tr
                   <div className="mt-1 rounded-xl bg-slate-50 p-3 text-[12px] leading-relaxed text-slate-700">
                     {e.why ? <p>📘 {e.why}</p> : <p>這個事件沒有額外說明。</p>}
                     {stepTitles[e.stepId] && (
-                      <button type="button" onClick={() => onRetryStep(e.stepId)} className="mt-1 font-bold text-blue-700 hover:underline">
-                        ↻ 以引導模式重練「{stepTitles[e.stepId]}」
-                      </button>
+                      <div className="mt-1 flex flex-wrap gap-3">
+                        {onWatchDemo && (
+                          <button type="button" onClick={() => onWatchDemo(e.stepId)} className="font-bold text-emerald-700 hover:underline">
+                            🎬 觀看對應的正確示範
+                          </button>
+                        )}
+                        <button type="button" onClick={() => onRetryStep(e.stepId)} className="font-bold text-blue-700 hover:underline">
+                          ↻ 以引導模式重練「{stepTitles[e.stepId]}」
+                        </button>
+                      </div>
                     )}
                   </div>
                 )}

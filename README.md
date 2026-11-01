@@ -1,6 +1,6 @@
 # OSCE Learning Islands｜醫學生 OSCE 學習探索島
 
-3D 群島學習平台。目前已開放：**病史詢問島 → HISTORY QUEST 病史偵探學院**、**技能操作島 → 技能訓練中心 → 傷口縫合、導尿管置入（CATHETER QUEST）互動關卡**。
+3D 群島學習平台。目前已開放：**病史詢問島 → HISTORY QUEST 病史偵探學院**、**技能操作島 → 技能訓練中心 → 傷口縫合、導尿管置入（CATHETER QUEST）、氣管內管插管（AIRWAY QUEST）互動關卡**。
 
 🌐 線上版：https://luyun1224.github.io/osce-island/
 
@@ -54,11 +54,21 @@ npm run preview    # 預覽正式版
 - **評量**：14 項規準逐字依考官指引（第 7、11、12 項只有 0／2 分），整體表現 1–5 分由教師評估；回饋含狀態摘要、操作順序與**操作歷程回放**
 - 低多邊形 3D 急診診間可點選物件切換階段；手機版改以 2D 操作為主
 
+## 技能操作島：氣管內管插管關卡（AIRWAY QUEST）
+
+路徑：技能訓練中心 → 氣管內管插管（`#/skill/endotracheal-intubation`）。依《氣管插管(1).pdf》建置；完整設計說明見 [`docs/airway-quest-plan.md`](docs/airway-quest-plan.md)。
+
+- **四種模式**：正確示範（共用 `DemonstrationPlayer`，資料驅動時間軸、六章、旁白字幕逐句同步、0.5–2 倍速、章節跳轉）／教學引導（可隨時觀看對應示範片段）／自主練習／8 分鐘 OSCE 模擬挑戰
+- **8 個互動階段**：器材準備與檢查 → 插管前通氣 → 頭部擺位 → 喉頭鏡 → 置入氣管內管 → 通條與 cuff → 插管後確認 → 固定
+- **鏡頭切換**：3D 全景／呼吸道／胸廓，2D 喉頭鏡局部／管路位置／聽診位置（皆標示教學示意）
+- **案例規則**：胸廓、聽診與波形 ETCO₂ 依管路位置與深度決定，不使用隨機生理數據；波形 ETCO₂ 標示為「現行臨床安全補充」，不計入教案評分
+- **評量與回饋**：14 項規準含有效分數、來源頁、審核狀態與待教師確認事項；報告分開呈現數位評量、實體評核項目、安全警示與教師整體表現；回放中點錯誤事件可直接看對應示範章節或重練
+
 ### 新增技能關卡
 
 1. 在 `src/features/skills/registry/skillRegistry.ts` 新增一筆技能並提供 `load()`
 2. 在 `src/features/skills/<skill-id>/` 建立：`caseData.ts`（SkillCase）、`engine.ts`（互動規則 reducer）、`rubric.ts`（AssessmentRubric）、`report.ts`（FeedbackReport）與各階段 UI
-3. 共用框架在 `src/features/training/`：`interactionEngine`（事件紀錄／計時／暫停）、`hintSystem`、`assessment`、`modes`、`storage`、`sterile`（無菌狀態機、手套決策點、手部衛生部位）與 `components/`（拖曳、提示面板、操作紀錄、回饋報告、操作回放、手部衛生、病人溝通、無菌狀態卡）
+3. 共用框架在 `src/features/training/`：`interactionEngine`（事件紀錄／計時／暫停）、`hintSystem`、`assessment`、`modes`、`storage`、`sterile`（無菌狀態機、手套決策點、手部衛生部位）與 `components/`（拖曳、提示面板、操作紀錄、回饋報告、操作回放、手部衛生、病人溝通、無菌狀態卡、四模式入口 `TrainingModeSelector`、資料驅動示範播放器 `DemonstrationPlayer`）
 
 ## 部署（GitHub Pages）
 

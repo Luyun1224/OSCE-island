@@ -150,6 +150,7 @@ export const ISLANDS: IslandConfig[] = [
     modules: [
       { id: 'wound-suturing', title: '傷口縫合', type: 'skill', status: 'available' },
       { id: 'urinary-catheterization', title: '導尿管置入', type: 'skill', status: 'available' },
+      { id: 'endotracheal-intubation', title: '氣管內管插管', type: 'skill', status: 'available' },
       { id: 'iv-cannulation', title: '靜脈留置針置入', type: 'skill', status: 'planned' },
     ],
   },

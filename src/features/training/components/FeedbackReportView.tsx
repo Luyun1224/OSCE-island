@@ -18,9 +18,11 @@ export function FeedbackReportView({
   onRetryStep,
   onRestart,
   onExit,
+  onWatchDemo,
 }: {
   report: FeedbackReport;
   history: AttemptRecord[];
+  onWatchDemo?: (stepId: string) => void;
   onRetryStep: (stepId: string) => void;
   onRestart: () => void;
   onExit: () => void;
@@ -87,6 +89,53 @@ export function FeedbackReportView({
             ))}
           </section>
         )}
+
+        {report.safetyAlerts && (
+          <section className="rounded-3xl bg-rose-50 p-4 shadow-sm ring-1 ring-rose-200 md:p-5">
+            <h2 className="text-sm font-black text-rose-800">🛑 臨床安全相關警示</h2>
+            <p className="text-[11px] text-rose-700">與規準分數分開呈現；即使分數不低，安全事件仍需優先檢討。</p>
+            {report.safetyAlerts.length === 0 ? (
+              <p className="mt-2 text-[13px] font-bold text-emerald-700">本次沒有安全相關事件。</p>
+            ) : (
+              <ul className="mt-2 space-y-1.5">
+                {report.safetyAlerts.map((a, i) => (
+                  <li key={i} className="rounded-xl bg-white p-3 text-[13px] text-slate-700 ring-1 ring-rose-100">
+                    <p className="font-bold text-rose-800">{a.title}</p>
+                    <p className="text-[12px] leading-relaxed">{a.detail}</p>
+                    <div className="mt-1 flex flex-wrap gap-3 text-[12px] font-bold">
+                      {onWatchDemo && (
+                        <button type="button" onClick={() => onWatchDemo(a.stepId)} className="text-emerald-700 hover:underline">
+                          🎬 觀看正確示範
+                        </button>
+                      )}
+                      <button type="button" onClick={() => onRetryStep(a.stepId)} className="text-blue-700 hover:underline">
+                        ↻ 重練這一段
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
+
+        {report.supplements?.map((sp) => (
+          <section key={sp.title} className="rounded-3xl bg-white/90 p-4 shadow-sm ring-1 ring-cyan-200 md:p-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-sm font-black text-slate-800">{sp.title}</h2>
+              <span className="rounded-full bg-cyan-100 px-2 py-0.5 text-[10px] font-bold text-cyan-800">{sp.tag}</span>
+            </div>
+            <ul className="mt-2 grid gap-1 text-[12px] md:grid-cols-2">
+              {sp.rows.map((r) => (
+                <li key={r.label} className="flex justify-between gap-2 rounded-lg bg-slate-50 px-2 py-1">
+                  <span className="text-slate-500">{r.label}</span>
+                  <span className={`font-bold ${r.tone === 'good' ? 'text-emerald-700' : r.tone === 'warn' ? 'text-amber-700' : 'text-slate-700'}`}>{r.value}</span>
+                </li>
+              ))}
+            </ul>
+            {sp.note && <p className="mt-2 text-[11px] text-slate-500">{sp.note}</p>}
+          </section>
+        ))}
 
         {report.sequence && report.sequence.length > 0 && (
           <section className="rounded-3xl bg-white/90 p-4 shadow-sm md:p-5">
@@ -181,6 +230,8 @@ export function FeedbackReportView({
                     </span>
                     <span className="text-[11px] text-slate-500">{SCORE_LABEL[it.score]}</span>
                   </span>
+                  {it.safetyCritical && <span className="shrink-0 rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-700">安全關鍵</span>}
+                  {it.reviewNote && <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">待教師確認</span>}
                   {it.observability === 'proxy' && <span className="shrink-0 rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-bold text-violet-700">需實體操作評核</span>}
                   <span className="text-slate-400 group-open:rotate-90">›</span>
                 </summary>
@@ -195,6 +246,18 @@ export function FeedbackReportView({
                   {it.evidence.length > 0 && <p className="text-emerald-700">✓ {it.evidence.join('；')}</p>}
                   {it.missing.length > 0 && <p className="text-amber-700">△ {it.missing.join('；')}</p>}
                   {it.physicalNote && <p className="text-violet-700">🖐 {it.physicalNote}</p>}
+                  {it.reviewNote && <p className="rounded-lg bg-amber-50 px-2 py-1 text-amber-900">⚖️ 待教師確認：{it.reviewNote}</p>}
+                  {(it.sourcePage || it.allowedScores) && (
+                    <p className="text-[11px] text-slate-400">
+                      有效分數：{it.allowedScores.join('／')}
+                      {it.sourcePage ? `・教案第 ${it.sourcePage} 頁` : ''}
+                    </p>
+                  )}
+                  {onWatchDemo && (
+                    <button type="button" onClick={() => onWatchDemo(it.stepIds[0])} className="mr-3 font-bold text-emerald-700 hover:underline">
+                      🎬 觀看正確示範
+                    </button>
+                  )}
                   <button type="button" onClick={() => onRetryStep(it.stepIds[0])} className="font-bold text-blue-700 hover:underline">
                     ↻ 練習相關階段
                   </button>
@@ -249,7 +312,7 @@ export function FeedbackReportView({
           )}
         </section>
 
-        <PracticeReplay events={report.events} stepTitles={stepTitles} onRetryStep={onRetryStep} />
+        <PracticeReplay events={report.events} stepTitles={stepTitles} onRetryStep={onRetryStep} onWatchDemo={onWatchDemo} />
 
         <section className="rounded-3xl bg-white/90 p-4 shadow-sm md:p-5">
           <button type="button" onClick={() => setShowEvents((v) => !v)} className="text-sm font-black text-slate-800">
