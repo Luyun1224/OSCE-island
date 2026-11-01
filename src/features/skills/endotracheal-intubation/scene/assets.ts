@@ -36,6 +36,12 @@ export const AIRWAY_ASSETS: AssetSpec[] = [
     nodes: ['Head', 'Mouth_Socket', 'Lung_L', 'Lung_R', 'Stomach'],
     morphs: ['lung_inflate_L', 'lung_inflate_R', 'stomach_inflate'],
   },
+  {
+    id: 'trainerPhoto',
+    file: 'trainer-photo.webp',
+    label: '氣道管理訓練模型照片浮雕（2.5D；照片＋高度圖＋法線圖＋肺部遮罩，已移除品牌字樣）',
+    required: false,
+  },
   { id: 'bed', file: 'hospital-bed.glb', label: '急診病床（可取代程式建模的病床）', required: false },
   { id: 'laryngoscope', file: 'laryngoscope-mac3.glb', label: 'Macintosh 喉頭鏡（握把＋葉片，可分離）', required: false, nodes: ['Handle', 'Blade', 'Light_Socket'] },
   { id: 'ett', file: 'ett-7_5.glb', label: '氣管內管 ID 7.5（含 15 mm 接頭、pilot balloon、cuff 可充氣）', required: false, morphs: ['cuff_inflate'] },

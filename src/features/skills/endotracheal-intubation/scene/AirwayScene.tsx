@@ -5,6 +5,7 @@ import { Suspense, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { ACESFilmicToneMapping, CatmullRomCurve3, DoubleSide, Mesh, Object3D, PlaneGeometry, SRGBColorSpace, Shape, Vector3, type Group, type Material, type MeshStandardMaterial } from 'three';
 import { chestFinding, maskSealed, type AWState } from '../engine';
 import { AIRWAY_ASSETS, assetUrl } from './assets';
+import { PhotoRelief } from './PhotoRelief';
 import { proceduralPBR } from './textures';
 
 /**
@@ -20,7 +21,7 @@ export type Scene3DPreset = 'panorama' | 'airway' | 'chest';
 /** 病床座標：床長軸為 z，頭端在 -z；床墊表面高 0.62 m */
 const PRESETS: Record<Scene3DPreset, { pos: [number, number, number]; target: [number, number, number] }> = {
   panorama: { pos: [1.75, 1.75, 1.55], target: [0, 0.68, -0.2] },
-  airway: { pos: [0.05, 1.42, 0.12], target: [0, 0.7, -0.74] },
+  airway: { pos: [0.08, 1.38, -0.02], target: [0, 0.68, -0.62] },
   chest: { pos: [1.05, 1.32, 0.15], target: [0, 0.66, -0.4] },
 };
 const MATTRESS_TOP = 0.62;
@@ -141,7 +142,7 @@ function roundedRect(w: number, h: number, r: number) {
   return s;
 }
 
-function Bed() {
+function Bed({ pillow = true }: { pillow?: boolean }) {
   const m = useMaterials();
   const board = useMemo(() => roundedRect(0.98, 0.5, 0.08), []);
   const rail = useMemo(() => {
@@ -192,9 +193,11 @@ function Bed() {
       <RoundedBox args={[0.92, 0.012, 1.62]} radius={0.006} position={[0, MATTRESS_TOP + 0.002, 0.12]} receiveShadow>
         <meshStandardMaterial {...m.linen} roughness={1} />
       </RoundedBox>
-      <RoundedBox args={[0.6, 0.11, 0.38]} radius={0.05} smoothness={8} position={[0, MATTRESS_TOP + 0.05, -0.8]} rotation={[0.08, 0, 0]} castShadow receiveShadow>
-        <meshStandardMaterial {...m.linen} roughness={1} />
-      </RoundedBox>
+      {pillow && (
+        <RoundedBox args={[0.6, 0.11, 0.38]} radius={0.05} smoothness={8} position={[0, MATTRESS_TOP + 0.05, -0.8]} rotation={[0.08, 0, 0]} castShadow receiveShadow>
+          <meshStandardMaterial {...m.linen} roughness={1} />
+        </RoundedBox>
+      )}
       {/* 床頭板、床尾板 */}
       <mesh position={[0, 0.78, -1.07]} castShadow receiveShadow>
         <extrudeGeometry args={[board, extrude]} />
@@ -314,6 +317,21 @@ function Attach({ id, available, socket, visible }: { id: string; available: Set
   return createPortal(<GLBInstance id={id} />, socket);
 }
 
+/** 照片浮雕訓練模型：依案例規則把通氣傳給肺部遮罩 */
+function ReliefTrainer({ state }: { state: AWState }) {
+  const { n, target } = useBreath(state);
+  const curve = useBreathCurve(n);
+  const breath = () => {
+    const k = curve();
+    return {
+      r: target === 'both' || target === 'right' ? k : target === 'weak' ? 0.3 * k : 0,
+      l: target === 'both' ? k : target === 'weak' ? 0.3 * k : 0,
+      s: target === 'stomach' ? k : 0,
+    };
+  };
+  return <PhotoRelief position={[0, MATTRESS_TOP + 0.014, -0.45]} breath={breath} />;
+}
+
 /* ---------------- 缺少病人資產時：明確標示的全像輪廓（位置標記，非完成品） ---------------- */
 const SILHOUETTE: [number, number][] = [
   [0, -0.88], [0.05, -0.865], [0.085, -0.82], [0.09, -0.77], [0.075, -0.72], [0.05, -0.69], [0.05, -0.65], [0.2, -0.62], [0.23, -0.58],
@@ -357,6 +375,7 @@ export default function AirwayScene({ state, preset, available, className, quali
   const a = state.attempt;
   const tubeIn = a.location !== 'none';
   const patientId = available.has('patient') ? 'patient' : available.has('trainer') ? 'trainer' : null;
+  const relief = !patientId && available.has('trainerPhoto');
   return (
     <div className={className}>
       <Canvas
@@ -379,7 +398,7 @@ export default function AirwayScene({ state, preset, available, className, quali
         <directionalLight position={[0.8, 2.6, 0.6]} intensity={1.25} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0003} shadow-camera-left={-2} shadow-camera-right={2} shadow-camera-top={2} shadow-camera-bottom={-2} />
         <spotLight position={[0, 2.4, -0.6]} angle={0.6} penumbra={0.8} intensity={6} distance={4} castShadow color="#fffaf0" />
         <Room />
-        <Bed />
+        <Bed pillow={!relief} />
         <Suspense fallback={null}>
           {patientId ? (
             <PatientGLB id={patientId} state={state}>
@@ -393,6 +412,8 @@ export default function AirwayScene({ state, preset, available, className, quali
                 </>
               )}
             </PatientGLB>
+          ) : relief ? (
+            <ReliefTrainer state={state} />
           ) : (
             <PatientPlaceholder state={state} />
           )}

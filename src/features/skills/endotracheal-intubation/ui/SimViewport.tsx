@@ -97,7 +97,14 @@ export function SimViewport({
           </div>
         </div>
 
-        {assets.state === 'ready' && !realistic3DReady(assets) && (
+        {assets.state === 'ready' && !realistic3DReady(assets) && assets.available.has('trainerPhoto') && (
+          <div className="absolute inset-x-0 bottom-[5.6rem] flex justify-center px-3">
+            <span className="rounded-full border border-amber-300/80 bg-slate-900/70 px-3 py-1 text-[11px] font-bold text-amber-100 shadow-lg backdrop-blur">
+              訓練模型：照片浮雕 2.5D（非完整 3D 模型）・肺部依案例規則起伏
+            </span>
+          </div>
+        )}
+        {assets.state === 'ready' && !realistic3DReady(assets) && !assets.available.has('trainerPhoto') && (
           <div className="absolute inset-x-0 bottom-[5.6rem] flex justify-center px-3">
             <span className="rounded-full border border-cyan-300/80 bg-slate-900/75 px-3 py-1 text-[11px] font-bold text-cyan-100 shadow-lg backdrop-blur">
               ⏳ 病人 3D 模型待補（patient-adult.glb／airway-trainer.glb）・床上虛線僅為位置與呼吸起伏標記
