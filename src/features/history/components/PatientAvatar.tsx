@@ -13,6 +13,8 @@ const FACE: Record<Mood, { brows: [string, string]; mouth: string; eyes?: 'dot' 
   upset: { brows: ['M41 38 L51 42', 'M69 42 L79 38'], mouth: 'M52 66 Q60 60 68 66' },
   pained: { brows: ['M41 38 L51 42', 'M69 42 L79 38'], mouth: 'M52 64 L56 62 L60 65 L64 62 L68 64', eyes: 'squint' },
   dizzy: { brows: ['M41 42 L51 39', 'M69 39 L79 42'], mouth: 'M54 65 Q60 62 66 65', eyes: 'squint' },
+  sad: { brows: ['M41 41 L51 38', 'M69 38 L79 41'], mouth: 'M52 66 Q60 61 68 66' },
+  angry: { brows: ['M41 37 L52 43', 'M68 43 L79 37'], mouth: 'M53 65 L67 65' },
 };
 
 /** 低多邊形風格的虛擬病人頭像（SVG，依情緒變化表情） */
@@ -78,6 +80,8 @@ export function PatientAvatar({ look = DEFAULT_LOOK, mood = 'neutral', size = 14
         </text>
       )}
       {mood === 'upset' && <path d="M88 26 l6 -4 M90 32 l7 0 M88 37 l6 4" stroke="#ef4444" strokeWidth="2.2" strokeLinecap="round" />}
+      {mood === 'sad' && <path d="M46 54 Q44 60 46 62 Q48 60 46 54 Z" fill="#7dd3fc" />}
+      {mood === 'angry' && <path d="M86 24 l8 8 M94 24 l-8 8" stroke="#dc2626" strokeWidth="2.6" strokeLinecap="round" />}
       {mood === 'relieved' && <path d="M90 30 l3 3 l6 -7" stroke="#10b981" strokeWidth="2.6" fill="none" strokeLinecap="round" />}
       {/* 以手撐頭（頭暈、疼痛） */}
       {(mood === 'dizzy' || mood === 'pained') && (
@@ -100,4 +104,6 @@ export const MOOD_LABEL: Record<Mood, string> = {
   upset: '不悅',
   pained: '不舒服',
   dizzy: '頭暈',
+  sad: '悲傷',
+  angry: '生氣',
 };

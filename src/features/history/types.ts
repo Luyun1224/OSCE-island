@@ -20,7 +20,7 @@ export interface ReviewMeta {
 /* 虛擬病人外觀                                                           */
 /* ------------------------------------------------------------------ */
 
-export type Mood = 'neutral' | 'calm' | 'anxious' | 'worried' | 'confused' | 'upset' | 'relieved' | 'pained' | 'dizzy';
+export type Mood = 'neutral' | 'calm' | 'anxious' | 'worried' | 'confused' | 'upset' | 'relieved' | 'pained' | 'dizzy' | 'sad' | 'angry';
 
 export interface PatientLook {
   name: string;

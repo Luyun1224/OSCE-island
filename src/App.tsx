@@ -14,9 +14,11 @@ import type { IslandId } from './types/island';
  *  #/island/procedural-skills 技能訓練中心
  *  #/skill/:skillId           技能訓練關卡
  *  #/history/...              病史詢問島 HISTORY QUEST
+ *  #/care/...                 醫病溝通與衛教島 CARE ISLAND
  */
 const lazyCache = new Map<string, LazyExoticComponent<ComponentType>>();
 const HistoryQuestApp = lazy(() => import('./features/history/HistoryQuestApp'));
+const CareApp = lazy(() => import('./features/care/CareApp'));
 
 function Loading({ text }: { text: string }) {
   return (
@@ -69,6 +71,14 @@ export default function App() {
     return (
       <Suspense fallback={<Loading text="正在前往病史偵探學院…" />}>
         <HistoryQuestApp path={path} />
+      </Suspense>
+    );
+  }
+
+  if (path === '/care' || path.startsWith('/care/')) {
+    return (
+      <Suspense fallback={<Loading text="正在前往醫病溝通島…" />}>
+        <CareApp path={path} />
       </Suspense>
     );
   }

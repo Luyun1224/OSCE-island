@@ -72,6 +72,8 @@ export function DemonstrationPlayer<S, A, Cam extends string>({
   onWatched,
   exitLabel = '← 選擇模式',
   summary,
+  sourceLabels,
+  highlightTitle,
 }: {
   title: string;
   chapters: DemoChapterDef<A, Cam>[];
@@ -84,6 +86,10 @@ export function DemonstrationPlayer<S, A, Cam extends string>({
   onPractice?: (m: TrainingModeId) => void;
   onWatched?: () => void;
   exitLabel?: string;
+  /** 步驟來源標籤（預設：教案原始要求／現行臨床安全補充） */
+  sourceLabels?: { case: string; supplement: string };
+  /** 右欄重點物件標題（預設：本段重點器材） */
+  highlightTitle?: string;
   /** 示範完成後的重點摘要 */
   summary?: string[];
 }) {
@@ -248,7 +254,7 @@ export function DemonstrationPlayer<S, A, Cam extends string>({
           {reviewBanner}
           <div className="mb-2 flex flex-wrap items-baseline gap-2">
             <h2 className="text-lg font-black text-slate-800">{step.title}</h2>
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${step.source === 'supplement' ? 'bg-cyan-100 text-cyan-800' : 'bg-slate-100 text-slate-600'}`}>{step.source === 'supplement' ? '現行臨床安全補充（不在教案評分內）' : '教案原始要求'}</span>
+            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${step.source === 'supplement' ? 'bg-cyan-100 text-cyan-800' : 'bg-slate-100 text-slate-600'}`}>{step.source === 'supplement' ? (sourceLabels?.supplement ?? '現行臨床安全補充（不在教案評分內）') : (sourceLabels?.case ?? '教案原始要求')}</span>
           </div>
           {chapter.videoUrl ? <video src={chapter.videoUrl} controls className="w-full rounded-3xl bg-black" /> : <div className="pointer-events-none select-none">{renderView({ state, step, highlighted: step.highlightedObjects, cue })}</div>}
 
@@ -280,7 +286,7 @@ export function DemonstrationPlayer<S, A, Cam extends string>({
           </div>
           {step.highlightedObjects.some((h) => !h.startsWith('#')) && (
             <div className="rounded-2xl bg-white/80 p-3 ring-1 ring-slate-200">
-              <p className="text-[11px] font-bold tracking-wider text-slate-400">🔎 本段重點器材</p>
+              <p className="text-[11px] font-bold tracking-wider text-slate-400">{highlightTitle ?? '🔎 本段重點器材'}</p>
               <div className="mt-1 flex flex-wrap gap-1">
                 {step.highlightedObjects.filter((h) => !h.startsWith('#')).map((h) => (
                   <span key={h} className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-900">
