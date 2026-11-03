@@ -16,11 +16,13 @@ import type { IslandId } from './types/island';
  *  #/history/...              病史詢問島 HISTORY QUEST
  *  #/care/...                 醫病溝通與衛教島 CARE ISLAND
  *  #/clinical/...             病情解釋與臨床處置島 CLINICAL DECISION ISLAND
+ *  #/exam/...                 身體檢查島 PHYSICAL EXAM QUEST
  */
 const lazyCache = new Map<string, LazyExoticComponent<ComponentType>>();
 const HistoryQuestApp = lazy(() => import('./features/history/HistoryQuestApp'));
 const CareApp = lazy(() => import('./features/care/CareApp'));
 const ClinicalApp = lazy(() => import('./features/clinical/ClinicalApp'));
+const ExamApp = lazy(() => import('./features/exam/ExamApp'));
 
 function Loading({ text }: { text: string }) {
   return (
@@ -73,6 +75,14 @@ export default function App() {
     return (
       <Suspense fallback={<Loading text="正在前往病史偵探學院…" />}>
         <HistoryQuestApp path={path} />
+      </Suspense>
+    );
+  }
+
+  if (path === '/exam' || path.startsWith('/exam/')) {
+    return (
+      <Suspense fallback={<Loading text="正在前往身體檢查島…" />}>
+        <ExamApp path={path} />
       </Suspense>
     );
   }
