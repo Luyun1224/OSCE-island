@@ -14,3 +14,15 @@ export const SITE = {
   /** 練習紀錄上傳（同一個 Apps Script，設定見 docs/practice-log.md）；改成空字串即停止上傳 */
   practiceLogUrl: GAS_URL,
 };
+
+/**
+ * 外部網站：臨床技能島（另一個網站，不經過本站的 hash 路由）
+ * 一律以一般 <a href target="_self"> 在目前分頁開啟，保留瀏覽器「上一頁」。
+ */
+export const EXTERNAL_LINKS = {
+  skillsIsland: {
+    url: 'https://estrea07203388.github.io/acls-dashboard/chimei-skills-park%20.html#map',
+    label: '前往臨床技能島',
+    description: '奇美臨床技能島（另一個網站，於目前分頁開啟）',
+  },
+} as const;

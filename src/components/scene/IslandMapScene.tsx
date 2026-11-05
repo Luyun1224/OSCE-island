@@ -7,6 +7,7 @@ import { CentralPlaza } from './CentralPlaza';
 import { Island } from './Island';
 import { Ocean } from './Ocean';
 import { SeaRoutes } from './SeaRoutes';
+import { SkillsIslandPortal } from './SkillsIslandPortal';
 import { SkyRig, TimeOfDayProvider, type TimeOfDay } from './timeOfDay';
 
 interface IslandMapSceneProps {
@@ -39,6 +40,7 @@ export function IslandMapScene({ selectedId, hoveredId, onSelect, onHover, onBac
       <Ambience />
       <SeaRoutes activeId={selectedId ?? hoveredId} />
       <CentralPlaza onClick={onBackToOverview} showLabel={!selectedId} />
+      <SkillsIslandPortal showLabel={!selectedId} />
 
       {ISLANDS.map((island) => (
         <Island

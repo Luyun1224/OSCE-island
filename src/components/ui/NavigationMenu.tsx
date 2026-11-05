@@ -1,6 +1,7 @@
 import { ISLANDS } from '../../data/islandData';
 import type { IslandId } from '../../types/island';
 import { IslandCard } from './IslandCard';
+import { SkillsIslandLink } from './SkillsIslandLink';
 
 interface NavigationMenuProps {
   selectedId: IslandId | null;
@@ -37,6 +38,7 @@ export function NavigationMenu({ selectedId, onSelect, onHover, onOverview }: Na
             onHover={(h) => onHover(h ? island.id : null)}
           />
         ))}
+        <SkillsIslandLink />
       </nav>
 
       {/* 手機版 */}
@@ -53,6 +55,7 @@ export function NavigationMenu({ selectedId, onSelect, onHover, onOverview }: Na
         {ISLANDS.map((island) => (
           <IslandCard key={island.id} island={island} compact active={island.id === selectedId} onClick={() => onSelect(island.id)} />
         ))}
+        <SkillsIslandLink compact />
       </nav>
     </>
   );
