@@ -21,7 +21,7 @@ export const SITE = {
  */
 export const EXTERNAL_LINKS = {
   skillsIsland: {
-    url: 'https://estrea07203388.github.io/acls-dashboard/chimei-skills-park%20.html#map',
+    url: 'https://estrea07203388.github.io/Chimei-skill-park/',
     label: '前往臨床技能島',
     description: '奇美臨床技能島（另一個網站，於目前分頁開啟）',
   },
